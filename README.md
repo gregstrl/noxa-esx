@@ -9,7 +9,7 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
 - **menuv** (ThymonA) — système de menus unifié (thème default)
 - **Panels NUI Noxa** (visuels exacts, ne pas modifier le HTML) :
   - `noxa_anticheat` — panel anti-cheat tablette N&B (F6)
-  - `noxa_gestion` — panel gestion serveur (F9, superadmin)
+  - `noxa_gestion` — panel gestion serveur (F9, superadmin) — éditeur de config branché live à ESX
   - `noxa_phone` — téléphone (F1)
   - `noxa_inventaire` — inventaire (I)
 - **`noxa_admin`** — menu admin ultra complet **menuv** (F10) + **/report** joueur→staff + **prise de service** (/duty)
@@ -111,9 +111,10 @@ F **5-20k** · E **20-60k** · D **60-150k** · C **150-400k** · B **400-900k**
 |---|---|---|
 | ESX Legacy core | ✅ | Framework officiel |
 | Panels NUI (visuels) | ✅ | anti-cheat, phone, gestion, inventaire, boutique |
-| Liaison données panels | 🟡 | phone + inventaire liés au serveur ESX · autres en cours |
+| Liaison données panels | 🟡 | phone + inventaire + **gestion** liés au serveur ESX · autres en cours |
 | Téléphone (F1) | ✅ | données live ESX/SQL, envoi SMS + tweets, ouverture/fermeture |
 | Inventaire (I) | ✅ | inventaire ESX live + **images d'items** · utiliser / jeter / donner (anti-dupe serveur) |
+| Gestion serveur (F9) | ✅ | éditeur de config **live ESX** (jobs, items, véhicules, lieux) · ouverture + écritures DB superadmin server-side · pont `bridge.js` (visuel figé intact) |
 | Menu admin (F10) | ✅ | menuv natif · reports · prise de service · sanctions · logs · grade vérifié server-side |
 | Véhicules & Garages | ✅ | ESX natif (`owned_vehicles`) · concession 7 classes F→S · garages · fourrière · carburant 2$/% |
 | Drogues | ✅ | ESX natif · cultures (E) · transformation menuv · vente revendeurs (black_money) · anti-farm/anti-dupe server-side |

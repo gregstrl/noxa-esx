@@ -17,6 +17,10 @@
       This page requires JavaScript to display.
     </div>
   </noscript>
+  <!-- NOXA: pont ESX<->NUI (donnees live + actions superadmin). N'altere PAS
+       le layout fige ; pose des ecouteurs window/timer qui survivent au
+       remplacement du DOM par le bundler. -->
+  <script src="bridge.js"></script>
 </head>
 <body>
   <div id="__bundler_thumbnail">

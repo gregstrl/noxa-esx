@@ -1061,6 +1061,7 @@ CREATE TABLE IF NOT EXISTS `noxa_ac_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Téléphone : contacts
+--  ⚠️ colonnes alignées sur noxa_phone/server.lua (display, pas name)
 CREATE TABLE IF NOT EXISTS `noxa_phone_contacts` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `owner` VARCHAR(64) NOT NULL,
@@ -1070,20 +1071,119 @@ CREATE TABLE IF NOT EXISTS `noxa_phone_contacts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Téléphone : SMS
+--  ⚠️ colonnes alignées sur server.lua (sender/receiver/message/is_read)
 CREATE TABLE IF NOT EXISTS `noxa_phone_messages` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `from_num` VARCHAR(20) NOT NULL,
-  `to_num` VARCHAR(20) NOT NULL,
-  `body` VARCHAR(512) NOT NULL,
+  `sender` VARCHAR(20) NOT NULL,
+  `receiver` VARCHAR(20) NOT NULL,
+  `message` TEXT NOT NULL,
+  `is_read` TINYINT(1) NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`), KEY `idx_from` (`from_num`), KEY `idx_to` (`to_num`)
+  PRIMARY KEY (`id`), KEY `idx_sender` (`sender`), KEY `idx_receiver` (`receiver`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Téléphone : réseau social (tweets)
+-- Téléphone : réseau social (Canari/tweets)
+--  ⚠️ colonnes alignées sur server.lua (author_id/author_name/handle/message/likes/retweets)
 CREATE TABLE IF NOT EXISTS `noxa_phone_tweets` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `author` VARCHAR(64) NOT NULL,
-  `body` VARCHAR(280) NOT NULL,
+  `author_id` VARCHAR(64) NOT NULL,
+  `author_name` VARCHAR(64) NOT NULL,
+  `handle` VARCHAR(32) NOT NULL,
+  `message` TEXT NOT NULL,
+  `likes` INT(11) NOT NULL DEFAULT 0,
+  `retweets` INT(11) NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`), KEY `idx_created` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================================
+--  MIGRATION IDEMPOTENTE noxa_phone (bases déjà importées avec l'ancien
+--  schéma). Aucune erreur si déjà à jour ou table neuve. Sans DELIMITER
+--  (compatible import phpMyAdmin direct) via instructions préparées.
+-- =====================================================================
+
+-- contacts : ancienne colonne `name` -> `display` (préserve les données)
+SET @has_old := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_contacts' AND COLUMN_NAME = 'name');
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_contacts' AND COLUMN_NAME = 'display');
+SET @s := IF(@has_old > 0 AND @has_new = 0,
+  'ALTER TABLE `noxa_phone_contacts` CHANGE `name` `display` VARCHAR(64) NOT NULL', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- messages : from_num -> sender
+SET @has_old := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_messages' AND COLUMN_NAME = 'from_num');
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_messages' AND COLUMN_NAME = 'sender');
+SET @s := IF(@has_old > 0 AND @has_new = 0,
+  'ALTER TABLE `noxa_phone_messages` CHANGE `from_num` `sender` VARCHAR(20) NOT NULL', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- messages : to_num -> receiver
+SET @has_old := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_messages' AND COLUMN_NAME = 'to_num');
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_messages' AND COLUMN_NAME = 'receiver');
+SET @s := IF(@has_old > 0 AND @has_new = 0,
+  'ALTER TABLE `noxa_phone_messages` CHANGE `to_num` `receiver` VARCHAR(20) NOT NULL', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- messages : body -> message
+SET @has_old := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_messages' AND COLUMN_NAME = 'body');
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_messages' AND COLUMN_NAME = 'message');
+SET @s := IF(@has_old > 0 AND @has_new = 0,
+  'ALTER TABLE `noxa_phone_messages` CHANGE `body` `message` TEXT NOT NULL', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- messages : ajout is_read si absent
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_messages' AND COLUMN_NAME = 'is_read');
+SET @s := IF(@has_new = 0,
+  'ALTER TABLE `noxa_phone_messages` ADD COLUMN `is_read` TINYINT(1) NOT NULL DEFAULT 0', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- tweets : body -> message
+SET @has_old := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'body');
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'message');
+SET @s := IF(@has_old > 0 AND @has_new = 0,
+  'ALTER TABLE `noxa_phone_tweets` CHANGE `body` `message` TEXT NOT NULL', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- tweets : author -> author_name
+SET @has_old := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'author');
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'author_name');
+SET @s := IF(@has_old > 0 AND @has_new = 0,
+  'ALTER TABLE `noxa_phone_tweets` CHANGE `author` `author_name` VARCHAR(64) NOT NULL', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- tweets : colonnes manquantes (DEFAULT pour ne pas casser les lignes existantes)
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'author_id');
+SET @s := IF(@has_new = 0,
+  'ALTER TABLE `noxa_phone_tweets` ADD COLUMN `author_id` VARCHAR(64) NOT NULL DEFAULT ''''', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'handle');
+SET @s := IF(@has_new = 0,
+  'ALTER TABLE `noxa_phone_tweets` ADD COLUMN `handle` VARCHAR(32) NOT NULL DEFAULT ''''', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'likes');
+SET @s := IF(@has_new = 0,
+  'ALTER TABLE `noxa_phone_tweets` ADD COLUMN `likes` INT(11) NOT NULL DEFAULT 0', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'noxa_phone_tweets' AND COLUMN_NAME = 'retweets');
+SET @s := IF(@has_new = 0,
+  'ALTER TABLE `noxa_phone_tweets` ADD COLUMN `retweets` INT(11) NOT NULL DEFAULT 0', 'DO 0');
+PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;

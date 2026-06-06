@@ -8,9 +8,8 @@ local ESX = exports['es_extended']:getSharedObject()
 CreateThread(function()
     MySQL.query.await([[
         CREATE TABLE IF NOT EXISTS `noxa_phone_contacts` (
-            `id` INT(11) NOT NULL AUTO_INCREMENT, `owner` VARCHAR(60) NOT NULL,
+            `id` INT(11) NOT NULL AUTO_INCREMENT, `owner` VARCHAR(64) NOT NULL,
             `display` VARCHAR(64) NOT NULL, `number` VARCHAR(20) NOT NULL,
-            `favorite` TINYINT(1) NOT NULL DEFAULT 0,
             PRIMARY KEY (`id`), KEY `idx_owner` (`owner`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ]])

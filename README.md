@@ -29,6 +29,21 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
 - Actions sensibles (set argent, ban permanent, météo/heure, annonces) = **admin/superadmin** uniquement.
 - Toute action sensible journalisée dans `noxa_admin_logs` (+ console).
 
+## Inventaire (`noxa_inventaire`)
+- **Visuel figé** : `html/index.html` (layout) **non modifié**. La liaison ESX passe par un
+  pont (`html/bridge.js`) qui réutilise le moteur du layout (`inv` / `renderAll` / `itemMarkup`)
+  et injecte les données réelles + les **images** sans toucher au markup/CSS.
+- **Données live** : `client.lua` ouvre l'inventaire avec le snapshot serveur (items, quantités,
+  poids, argent, capacité ESX réelle). Chaque slot affiche `images/<name>.png`.
+- **Actions** (autorité serveur, **anti-dupe**) : Utiliser (`aUse`), Jeter (`aMove`),
+  Fermer (`aClose`) + event `giveItem` (donner au joueur proche). Le serveur vérifie toujours
+  la possession réelle avant de retirer.
+- **Images** : `html/images/<name>.png` (nom = `name` exact de l'item dans la table ESX `items`).
+  Icônes réelles via ox_inventory + icônes générées pour les items ESX manquants. Image
+  absente → `images/placeholder.png` automatiquement.
+  → **Ajouter un item** : déposer son PNG `html/images/<name>.png` (le `files{}` du fxmanifest
+  charge `html/images/*.png`, aucune autre étape).
+
 ## Architecture
 - ESX Legacy = base intacte. On construit PAR-DESSUS, on ne réinvente rien.
 - Tout script ESX du marché se drop dans `resources/` et fonctionne direct.
@@ -40,7 +55,8 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
 |---|---|---|
 | ESX Legacy core | ✅ | Framework officiel |
 | Panels NUI (visuels) | ✅ | anti-cheat, phone, gestion, inventaire, boutique |
-| Liaison données panels | 🟡 | phone lié au serveur ESX (contacts, SMS, banque, Canari, garage) · autres en cours |
+| Liaison données panels | 🟡 | phone + inventaire liés au serveur ESX · autres en cours |
 | Téléphone (F1) | ✅ | données live ESX/SQL, envoi SMS + tweets, ouverture/fermeture |
+| Inventaire (I) | ✅ | inventaire ESX live + **images d'items** · utiliser / jeter / donner (anti-dupe serveur) |
 | Menu admin (F10) | ✅ | menuv natif · reports · prise de service · sanctions · logs · grade vérifié server-side |
 > ✅ Fonctionnel · 🟡 En cours · ❌ Non démarré

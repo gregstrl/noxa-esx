@@ -122,7 +122,8 @@
 
       var slot = 0;
       if (p.money != null) {
-        inv.L[0] = { g: 'money', nm: 'Argent', value: fmtMoney(p.money), wt: 0 };
+        inv.L[0] = { g: 'money', nm: 'Argent', value: fmtMoney(p.money), wt: 0,
+                     img: 'images/money.png' };
         slot = 1;
       }
       (p.items || []).forEach(function (it) {
@@ -155,22 +156,57 @@
     if (installed && ready()) { pending = null; applyNow(p); }
   }
 
+  // ----------------------------------------------------------------
+  // VISIBILITE — le layout fige (.stage position:fixed inset:0) n'a
+  // AUCUNE logique d'affichage : la page NUI resterait visible en
+  // permanence. On masque tout par defaut et on n'affiche que sur
+  // 'open'. On ne touche pas au markup : on pilote display sur <body>
+  // (couvre l'ecran de chargement du bundler ET la .stage rendue).
+  // ----------------------------------------------------------------
+  var visible = false;
+
+  function applyVisibility() {
+    var b = document.body;
+    if (b) b.style.display = visible ? '' : 'none';
+  }
+
+  function setVisible(v) {
+    visible = !!v;
+    applyVisibility();
+  }
+
   // --- Reception des donnees live depuis client.lua ---
   window.addEventListener('message', function (ev) {
     var d = (ev && ev.data) || {};
-    if (d.action === 'open' || d.action === 'setInventory') {
-      var payload = d.inv || d.data;
-      if (payload) apply(payload);
+    if (d.action === 'open') {
+      setVisible(true);
+      var op = d.inv || d.data;
+      if (op) apply(op);
+    } else if (d.action === 'setInventory') {
+      var sp = d.inv || d.data;
+      if (sp) apply(sp);
+    } else if (d.action === 'close') {
+      setVisible(false);
     }
   });
 
-  // --- Poller : pose les overrides + applique l'inventaire en attente
-  //     des que la grille du layout apparait (post-bundler). ---
-  var timer = setInterval(function () {
-    install();
-    if (installed) {
-      clearInterval(timer);
-      if (pending) { var q = pending; pending = null; applyNow(q); }
+  // --- Echap ferme l'inventaire (le footer du layout l'annonce) ---
+  window.addEventListener('keydown', function (e) {
+    if (!visible) return;
+    if (e.key === 'Escape' || e.key === 'Backspace') {
+      e.preventDefault();
+      nui('closeInv', {});
     }
-  }, 120);
+  }, true);
+
+  // --- Garde persistante : pose les overrides, applique l'inventaire
+  //     en attente, ET maintient l'etat de visibilite meme apres que le
+  //     bundler ait remplace le document (nos refs DOM sont re-resolues
+  //     a chaque tick). Tourne en continu : cout negligeable. ---
+  applyVisibility(); // masque immediatement l'ecran de chargement
+  setInterval(function () {
+    install();
+    if (installed && pending) { var q = pending; pending = null; applyNow(q); }
+    applyVisibility();
+  }, 60);
 })();

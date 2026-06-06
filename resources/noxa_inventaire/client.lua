@@ -64,10 +64,16 @@ RegisterNetEvent('noxa_inventaire:effect', function(kind, amount)
 end)
 
 -- ---- Ouverture / fermeture ----
-RegisterCommand('inventaire', function()
+local function toggleInv()
     if isOpen then closeInv() else openInv() end
-end, false)
+end
+
+-- Touche I (spec Noxa) + F2 (annonce par le footer du layout) : les deux togglent.
+RegisterCommand('inventaire', toggleInv, false)
 RegisterKeyMapping('inventaire', 'Ouvrir / fermer l inventaire NOXA', 'keyboard', 'I')
+
+RegisterCommand('inventaire_f2', toggleInv, false)
+RegisterKeyMapping('inventaire_f2', 'Ouvrir / fermer l inventaire NOXA (F2)', 'keyboard', 'F2')
 
 AddEventHandler('onResourceStop', function(res)
     if res == GetCurrentResourceName() and isOpen then SetNuiFocus(false, false) end

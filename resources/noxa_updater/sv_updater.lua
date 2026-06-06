@@ -17,9 +17,6 @@ local INDEX_FILE    = 'sql/migrations.index'
 local STATE_FILE    = 'sync/state.txt'          -- écrit par update.sh (diff git)
 local BASELINE_KEY  = '__baseline__'
 
--- Ressources « cœur » à recharger en plus des noxa_* (fallback sans state.txt).
-local CORE_RELOAD   = { 'es_extended' }
-
 -- ---------------------------------------------------------------------
 --  Sortie console (rapport)
 -- ---------------------------------------------------------------------
@@ -194,16 +191,14 @@ end
 
 -- Fallback : recharge toutes les ressources noxa_* (+ cœur) présentes.
 local function reloadAllNoxa(report)
+    -- Fallback (pas de diff git) : on ne recharge QUE les noxa_*. On ne touche
+    -- PAS à es_extended ici (un restart du framework en pleine session est
+    -- inutilement violent) : le cœur n'est rechargé que si update.sh l'a
+    -- explicitement marqué « modifié » dans state.txt (voir reloadResources).
     local total = GetNumResources and GetNumResources() or 0
     for i = 0, total - 1 do
         local name = GetResourceByFindIndex(i)
         if name and (name:sub(1, 5) == 'noxa_') and name ~= RES then
-            reloadOne(name)
-            report.reloaded[#report.reloaded + 1] = name
-        end
-    end
-    for _, name in ipairs(CORE_RELOAD) do
-        if GetResourceState(name) ~= 'missing' then
             reloadOne(name)
             report.reloaded[#report.reloaded + 1] = name
         end

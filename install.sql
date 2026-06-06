@@ -1046,7 +1046,12 @@ CREATE TABLE IF NOT EXISTS `banking` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE `users` ADD COLUMN `pincode` INT NULL;
+-- Idempotent : n'ajoute `pincode` que si la colonne n'existe pas déjà.
+SET @col_pincode := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'pincode');
+SET @sql_pincode := IF(@col_pincode = 0,
+  'ALTER TABLE `users` ADD COLUMN `pincode` INT NULL', 'DO 0');
+PREPARE stmt_pincode FROM @sql_pincode; EXECUTE stmt_pincode; DEALLOCATE PREPARE stmt_pincode;
 
 -- =====================================================================
 --  TABLES CUSTOM NOXA (ajoutées par les ressources noxa_*)
@@ -1054,6 +1059,16 @@ ALTER TABLE `users` ADD COLUMN `pincode` INT NULL;
 --  ajoutée ICI (jamais de fichier .sql séparé). install.sql = LE seul
 --  fichier à importer pour installer 100% du serveur.
 -- =====================================================================
+
+-- Suivi des migrations appliquées (système d'auto-update noxa_updater).
+--  Chaque migration sql/migrations/*.sql n'est jouée qu'UNE fois : son nom
+--  de fichier est inséré ici après application. `__baseline__` marque que
+--  install.sql a déjà été appliqué sur cette base.
+CREATE TABLE IF NOT EXISTS `noxa_migrations` (
+  `name` VARCHAR(190) NOT NULL,
+  `applied_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Anti-cheat : logs
 CREATE TABLE IF NOT EXISTS `noxa_ac_logs` (

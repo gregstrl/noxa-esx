@@ -1,0 +1,4 @@
+# Miroir SQL synchronisé + état de diff : générés par update.sh / update.bat.
+# La SOURCE unique reste /install.sql et /sql/migrations/ (versionnés).
+resources/noxa_updater/sql/
+resources/noxa_updater/sync/

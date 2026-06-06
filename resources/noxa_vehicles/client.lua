@@ -5,7 +5,7 @@
 -- =====================================================================
 
 local catalogByClass = {}   -- { classId = { entries... } }
-for _, v in ipairs(Config.Catalog) do
+for _, v in ipairs(Config.Catalog or {}) do
     catalogByClass[v.class] = catalogByClass[v.class] or {}
     table.insert(catalogByClass[v.class], v)
 end
@@ -47,10 +47,10 @@ end
 -- =====================================================================
 --  MENUS menuv
 -- =====================================================================
-local concessionMenu = MenuV:CreateMenu('Concession', 'NOXA Motors', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
-local classMenu      = MenuV:CreateMenu('Classe', 'Modèles disponibles', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
-local garageMenu     = MenuV:CreateMenu('Garage', 'Vos véhicules', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
-local impoundMenu    = MenuV:CreateMenu('Fourrière', 'Véhicules saisis', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
+local concessionMenu = MenuV:CreateMenu('Concession', 'NOXA Motors', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'noxa_vehicles_concessionMenu')
+local classMenu      = MenuV:CreateMenu('Classe', 'Modèles disponibles', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'noxa_vehicles_classMenu')
+local garageMenu     = MenuV:CreateMenu('Garage', 'Vos véhicules', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'noxa_vehicles_garageMenu')
+local impoundMenu    = MenuV:CreateMenu('Fourrière', 'Véhicules saisis', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'noxa_vehicles_impoundMenu')
 
 -- ---- Concession : liste des 7 classes -------------------------------
 for _, c in ipairs(Config.Classes) do

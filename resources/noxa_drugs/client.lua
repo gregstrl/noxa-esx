@@ -31,8 +31,8 @@ end
 -- =====================================================================
 --  MENUS menuv
 -- =====================================================================
-local labMenu    = MenuV:CreateMenu('Laboratoire', 'Transformation', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
-local dealerMenu = MenuV:CreateMenu('Revendeur', 'Marché noir', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
+local labMenu    = MenuV:CreateMenu('Laboratoire', 'Transformation', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'noxa_drugs_labMenu')
+local dealerMenu = MenuV:CreateMenu('Revendeur', 'Marché noir', 'topright', 245, 65, 65, 'size-110', 'default', 'menuv', 'noxa_drugs_dealerMenu')
 
 -- ---- Laboratoire : liste des recettes -------------------------------
 local function openLab(lab)

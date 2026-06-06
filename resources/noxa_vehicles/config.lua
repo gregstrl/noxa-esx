@@ -3,7 +3,7 @@
 --  Concession · Garage · Fourrière · Carburant
 --  Stack : ESX Legacy (owned_vehicles, ESX.Game) · oxmysql · menuv
 -- =====================================================================
-Config = {}
+Config = Config or {}
 
 -- Touche d'interaction (marqueurs concession / garage / fourrière / pompe)
 Config.InteractKey = 38 -- E

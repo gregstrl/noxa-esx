@@ -15,6 +15,7 @@ local function closePanel()
     isOpen = false
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'close' })
+    TriggerServerEvent('noxa_ac:closed')
 end
 
 -- ----- Callbacks NUI (envoyés par le panel HTML) ---------------------
@@ -23,6 +24,7 @@ end
 RegisterNUICallback('close', function(_, cb)
     isOpen = false
     SetNuiFocus(false, false)
+    TriggerServerEvent('noxa_ac:closed')
     cb({ ok = true })
 end)
 
@@ -30,6 +32,13 @@ end)
 RegisterNUICallback('action', function(data, cb)
     TriggerServerEvent('noxa_ac:action', data)
     cb({ ok = true })
+end)
+
+-- ----- Données live (serveur -> panel) -------------------------------
+-- Le serveur envoie le payload au format window.DATA ; bridge.js l'injecte
+-- dans le panel React sans toucher au HTML/CSS figé.
+RegisterNetEvent('noxa_ac:data', function(payload)
+    SendNUIMessage({ action = 'noxaData', data = payload })
 end)
 
 -- ----- Ouverture (commande + raccourci) ------------------------------
@@ -47,6 +56,19 @@ end)
 
 RegisterNetEvent('noxa_ac:denied', function()
     print('[NOXA AC] Accès refusé : permission manquante.')
+end)
+
+-- ----- Sonde anti-triche locale (validée côté serveur) ---------------
+-- On remonte des signaux locaux (invincibilité, noclip) ; le serveur décide.
+CreateThread(function()
+    while true do
+        Wait(5000)
+        -- Invincibilité = signal fiable et peu bruyant. Le serveur recoupe
+        -- avec ses propres détections (vitesse, warp) avant de flagger.
+        if GetPlayerInvincible(PlayerId()) then
+            TriggerServerEvent('noxa_ac:probe', { invincible = true })
+        end
+    end
 end)
 
 -- Sécurité : si la ressource s'arrête, on relâche le focus

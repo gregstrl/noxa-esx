@@ -80,6 +80,24 @@ anti-dupe) : le client n'affiche que du validé. Tout est piloté par `config.lu
 - **Ajouter une filière** : une entrée dans `Config.Fields` + une recette dans `Config.Labs` +
   un prix dans `Config.Dealers` (et l'item dans `install.sql` si nouveau).
 
+## Anti-Cheat (`noxa_anticheat`)
+Panel tablette N&B (**F6** / `/anticheat`, réservé ACE `noxa.anticheat`). Visuel React **figé**.
+- **Données live** poussées par le serveur (`noxa_ac:data`, toutes les 2 s) au format `window.DATA` :
+  joueurs (id, nom, ping, identifier ESX, métier, trust/flags, position), détections, bans, logs, staff, stats.
+- **Pont `html/bridge.js`** : le bundle React lit `window.DATA` une fois et n'écoute pas les messages
+  de données. Le pont survit au remplacement du DOM (listeners sur `window`), injecte les données live
+  dans `window.DATA` (avec helpers `ago`/`fmtTime` temps-réel) et **force un re-render** en capturant le
+  root React (patch non intrusif de `ReactDOM.createRoot`). **Aucun HTML/CSS du panel modifié** — seul un
+  `<script src="bridge.js">` est ajouté au shell loader, hors template visuel.
+- **Détections server-side ESX** (non contournables côté client) : speed hack, warp/teleport, injection
+  d'argent (cash+banque) ; sonde client pour l'invincibilité (god mode). Seuils **conservateurs** (anti
+  faux-positif), auto-kick **désactivé par défaut** — réglages dans `Config` (`server.lua`).
+- **Spawns** : trafic ambiant (`GetEntityPopulationType` 1–5) ignoré ; seuls les spawns **script/réseau**
+  près d'un joueur sont comptés.
+- **Actions staff** (autorité serveur, ACE re-vérifiée) : surveiller / avertir / expulser / bannir / résoudre.
+  Les **bans** utilisent la table **unifiée `noxa_bans`** (partagée avec `noxa_admin`, qui applique le
+  bannissement à la connexion). Détections persistées dans `noxa_ac_detections` (rechargées au démarrage).
+
 ## Économie & Prix (ESX natif)
 Tout passe par l'argent **ESX natif** (`cash` / `bank` / `black_money`).
 
@@ -111,7 +129,8 @@ F **5-20k** · E **20-60k** · D **60-150k** · C **150-400k** · B **400-900k**
 |---|---|---|
 | ESX Legacy core | ✅ | Framework officiel |
 | Panels NUI (visuels) | ✅ | anti-cheat, phone, gestion, inventaire, boutique |
-| Liaison données panels | 🟡 | phone + inventaire + **gestion** liés au serveur ESX · autres en cours |
+| Liaison données panels | 🟡 | anti-cheat + phone + inventaire + **gestion** liés au serveur ESX · autres en cours |
+| Anti-cheat (F6) | ✅ | données live (joueurs/détections/bans/logs/staff/stats) · pont React · détections server-side · actions staff · bans unifiés `noxa_bans` |
 | Téléphone (F1) | ✅ | données live ESX/SQL, envoi SMS + tweets, ouverture/fermeture |
 | Inventaire (I) | ✅ | inventaire ESX live + **images d'items** · utiliser / jeter / donner (anti-dupe serveur) |
 | Gestion serveur (F9) | ✅ | éditeur de config **live ESX** (jobs, items, véhicules, lieux) · ouverture + écritures DB superadmin server-side · pont `bridge.js` (visuel figé intact) |

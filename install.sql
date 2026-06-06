@@ -1067,6 +1067,25 @@ CREATE TABLE IF NOT EXISTS `noxa_ac_logs` (
   PRIMARY KEY (`id`), KEY `idx_ident` (`identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Anti-cheat : détections (historique persistant du panel noxa_anticheat)
+--  Les bans du panel utilisent la table unifiée `noxa_bans` (voir plus bas).
+CREATE TABLE IF NOT EXISTS `noxa_ac_detections` (
+  `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ref`        VARCHAR(16)  DEFAULT NULL,          -- réf affichée (ex: D-9F21)
+  `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `type`       VARCHAR(40)  DEFAULT NULL,          -- Speed Hack / God Mode / Money Exploit...
+  `identifier` VARCHAR(64)  DEFAULT NULL,
+  `name`       VARCHAR(64)  DEFAULT NULL,
+  `pid`        INT          DEFAULT NULL,
+  `severity`   VARCHAR(12)  DEFAULT 'medium',      -- low/medium/high/critical
+  `status`     VARCHAR(12)  DEFAULT 'open',        -- open/reviewing/resolved
+  `confidence` INT          DEFAULT 0,
+  `detail`     VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_det_created` (`created_at`),
+  KEY `idx_det_ident` (`identifier`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Téléphone : contacts
 --  ⚠️ colonnes alignées sur noxa_phone/server.lua (display, pas name)
 CREATE TABLE IF NOT EXISTS `noxa_phone_contacts` (

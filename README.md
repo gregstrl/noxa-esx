@@ -14,6 +14,7 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
   - `noxa_inventaire` — inventaire (I)
 - **`noxa_admin`** — menu admin ultra complet **menuv** (F10) + **/report** joueur→staff + **prise de service** (/duty)
 - **`noxa_vehicles`** — **véhicules** : concession (7 classes F→S), garages, fourrière, carburant (2$/%) — 100% ESX natif (`owned_vehicles`, `ESX.Game`)
+- **`noxa_drugs`** — **drogues** : champs de culture, laboratoires (**menuv**), revendeurs marché noir (`black_money`) — 100% ESX natif (inventaire `xPlayer`)
 
 ## Installation
 1. Importer **`install.sql`** (racine) dans ta base MySQL `noxa` (phpMyAdmin) — **fichier unique** : ESX complet + toutes les tables custom Noxa (`noxa_reports`, `noxa_admin_logs`, `noxa_warns`, `noxa_bans`, phone, anti-cheat...). Idempotent (réimport sans risque).
@@ -60,6 +61,23 @@ Tout passe par le serveur (argent, ownership, plaques) : le client n'affiche que
 - **Touche d'interaction** : `E` aux marqueurs (concession / garage / fourrière / pompe).
 - **Ajouter un véhicule au catalogue** : une ligne dans `Config.Catalog` (`model`, `label`, `class`, `price`).
 
+## Drogues (`noxa_drugs`)
+100% **ESX natif** — inventaire `xPlayer` (`addInventoryItem` / `removeInventoryItem`) + compte
+`black_money`. Récolte, transformation et vente repassent **toutes par le serveur** (anti-farm,
+anti-dupe) : le client n'affiche que du validé. Tout est piloté par `config.lua`.
+- **Cultures** (champs, marqueur + blip) : `E` pour récolter une **matière première**
+  (`cannabis`, `coca_leaf`, `poppy`). Quantité tirée server-side, **cooldown anti-farm** et
+  capacité de port ESX (`canCarryItem`) vérifiés à chaque récolte.
+- **Transformation** (laboratoire, menu **menuv**) : recettes `input → output`
+  (3x `cannabis` → `marijuana`, 3x `coca_leaf` → `cocaine`, 3x `poppy` → `heroin`). Le serveur
+  retire l'input **avant** d'ajouter l'output (anti-dupe).
+- **Vente** (revendeurs PED, menu **menuv**) : écoule tout le stock d'une drogue contre
+  **`black_money`**, prix unitaire **tiré au sort server-side** (marché volatil). Chaque vente est
+  journalisée dans `noxa_drugs_sales`.
+- **Touche d'interaction** : `E` aux marqueurs (champ / labo / revendeur).
+- **Ajouter une filière** : une entrée dans `Config.Fields` + une recette dans `Config.Labs` +
+  un prix dans `Config.Dealers` (et l'item dans `install.sql` si nouveau).
+
 ## Économie & Prix (ESX natif)
 Tout passe par l'argent **ESX natif** (`cash` / `bank` / `black_money`).
 
@@ -96,5 +114,6 @@ F **5-20k** · E **20-60k** · D **60-150k** · C **150-400k** · B **400-900k**
 | Inventaire (I) | ✅ | inventaire ESX live + **images d'items** · utiliser / jeter / donner (anti-dupe serveur) |
 | Menu admin (F10) | ✅ | menuv natif · reports · prise de service · sanctions · logs · grade vérifié server-side |
 | Véhicules & Garages | ✅ | ESX natif (`owned_vehicles`) · concession 7 classes F→S · garages · fourrière · carburant 2$/% |
+| Drogues | ✅ | ESX natif · cultures (E) · transformation menuv · vente revendeurs (black_money) · anti-farm/anti-dupe server-side |
 | Économie & Prix | ✅ | salaires $/h (civil/légal) · prix véhicules F→S calés · TVA 15% + puits monétaires anti-inflation |
 > ✅ Fonctionnel · 🟡 En cours · ❌ Non démarré

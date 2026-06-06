@@ -1255,3 +1255,28 @@ CREATE TABLE IF NOT EXISTS `noxa_bans` (
   KEY `idx_ident` (`identifier`),
   KEY `idx_license` (`license`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================================
+--  NOXA DRUGS (ressource noxa_drugs)
+--  Filières : cultures -> transformation -> vente (black_money)
+-- =====================================================================
+
+-- Items de drogue (idempotent). cannabis/marijuana existent déjà plus haut.
+INSERT IGNORE INTO `items` (`name`, `label`, `weight`, `rare`, `can_remove`) VALUES
+('coca_leaf', 'Feuille de coca', 2, 0, 1),
+('cocaine',   'Cocaïne',         2, 0, 1),
+('poppy',     'Pavot',           2, 0, 1),
+('heroin',    'Héroïne',         2, 0, 1);
+
+-- Journal des ventes au noir (économie / suivi RP)
+CREATE TABLE IF NOT EXISTS `noxa_drugs_sales` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `identifier` VARCHAR(64) NOT NULL,
+  `item` VARCHAR(64) NOT NULL,
+  `quantity` INT(11) NOT NULL DEFAULT 0,
+  `amount` INT(11) NOT NULL DEFAULT 0,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_ident` (`identifier`),
+  KEY `idx_item` (`item`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -41,8 +41,10 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
   Fermer (`aClose`) + event `giveItem` (donner au joueur proche). Le serveur vérifie toujours
   la possession réelle avant de retirer.
 - **Images** : `html/images/<name>.png` (nom = `name` exact de l'item dans la table ESX `items`).
-  Icônes réelles via ox_inventory + icônes générées pour les items ESX manquants. Image
-  absente → `images/placeholder.png` automatiquement.
+  **Couverture 100 %** : chaque item de la table `items` possède son icône. Icônes réelles issues
+  de packs FiveM publics (esx_inventoryhud Trsak/nertigel, qb-inventory) — ex. `blowpipe`→blowtorch,
+  `carotool`→toolbox, `carokit`→body kit, `gazbottle`→jerry can. Image absente →
+  `images/placeholder.png` automatiquement.
   → **Ajouter un item** : déposer son PNG `html/images/<name>.png` (le `files{}` du fxmanifest
   charge `html/images/*.png`, aucune autre étape).
 

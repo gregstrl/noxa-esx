@@ -60,6 +60,26 @@ Tout passe par le serveur (argent, ownership, plaques) : le client n'affiche que
 - **Touche d'interaction** : `E` aux marqueurs (concession / garage / fourrière / pompe).
 - **Ajouter un véhicule au catalogue** : une ligne dans `Config.Catalog` (`model`, `label`, `class`, `price`).
 
+## Économie & Prix (ESX natif)
+Tout passe par l'argent **ESX natif** (`cash` / `bank` / `black_money`).
+
+### Salaires (`job_grades.salary`)
+- Paie versée **toutes les 10 min** (`Config.PaycheckInterval`) = **6 paies/h** → `$/h = salary × 6`.
+- Hors service : **50 %** (`Config.OffDutyPaycheckMultiplier`).
+- **Fourchettes** : Civil **500-1500 $/h** · Légal **2000-4000 $/h** · (Illégal **4000-10000 $/h**, réservé aux gangs).
+- `unemployed` : 300 $/h — aide minimale, **sous** le plancher civil pour inciter à l'emploi.
+- Légal : police, ambulance, banker (2040 → 3960 $/h selon grade). Civil : cardealer, mechanic, taxi + métiers freelance (base + revente).
+- Les **boss** (grade max) restent à `0` : rémunérés via le **compte de société**.
+
+### Prix véhicules (concession, HT)
+F **5-20k** · E **20-60k** · D **60-150k** · C **150-400k** · B **400-900k** · A **0,9-2M** · S **2-8M $**.
+Échelle calée sur les salaires (un légal ≈3000 $/h) pour une vraie progression RP.
+
+### Anti-inflation (puits monétaires)
+- **TVA concession 15 %** (`Config.PurchaseTax`) prélevée **en plus** du prix, reversée à personne — affichée au joueur avant achat.
+- **Carburant** 2 $/% · **amende fourrière** 500 $.
+- Aucun crédit magique : achats / amendes / taxes **débités server-side** ; remboursement intégral seulement si l'opération échoue.
+
 ## Architecture
 - ESX Legacy = base intacte. On construit PAR-DESSUS, on ne réinvente rien.
 - Tout script ESX du marché se drop dans `resources/` et fonctionne direct.
@@ -76,4 +96,5 @@ Tout passe par le serveur (argent, ownership, plaques) : le client n'affiche que
 | Inventaire (I) | ✅ | inventaire ESX live + **images d'items** · utiliser / jeter / donner (anti-dupe serveur) |
 | Menu admin (F10) | ✅ | menuv natif · reports · prise de service · sanctions · logs · grade vérifié server-side |
 | Véhicules & Garages | ✅ | ESX natif (`owned_vehicles`) · concession 7 classes F→S · garages · fourrière · carburant 2$/% |
+| Économie & Prix | ✅ | salaires $/h (civil/légal) · prix véhicules F→S calés · TVA 15% + puits monétaires anti-inflation |
 > ✅ Fonctionnel · 🟡 En cours · ❌ Non démarré

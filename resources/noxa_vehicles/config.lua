@@ -26,7 +26,15 @@ Config.FuelDriveUsage    = 0.55     -- conso à plein régime / tick
 -- ---------------------------------------------------------------------
 --  FOURRIÈRE — amende de récupération
 -- ---------------------------------------------------------------------
-Config.ImpoundFee = 500 -- $ pour récupérer un véhicule fourrière
+Config.ImpoundFee = 500 -- $ pour récupérer un véhicule fourrière (puits monétaire)
+
+-- ---------------------------------------------------------------------
+--  ANTI-INFLATION — TVA concession
+--  Taxe prélevée EN PLUS du prix catalogue à l'achat d'un véhicule neuf.
+--  N'est reversée à personne : pur puits monétaire pour absorber le cash
+--  et freiner l'inflation. Affichée au joueur avant validation.
+-- ---------------------------------------------------------------------
+Config.PurchaseTax = 0.15 -- 15% de TVA sur tout achat en concession
 
 -- ---------------------------------------------------------------------
 --  7 CLASSES F → S (qualité croissante, prix justifiés par segment)
@@ -43,56 +51,58 @@ Config.Classes = {
 }
 
 -- Catalogue concession : modèle GTA, libellé, classe, prix.
--- Prix justifiés : progression cohérente F (~9k) → S (>1M).
+-- Prix calés sur les fourchettes économiques Noxa (HT, hors TVA 15%) :
+--   F 5-20k · E 20-60k · D 60-150k · C 150-400k · B 400-900k · A 0,9-2M · S 2-8M
+-- Échelle pensée vs salaires (légal ≈3000$/h) pour une vraie progression RP.
 Config.Catalog = {
-    -- F — Citadine : entrée de gamme, accessible
+    -- F — Citadine : entrée de gamme accessible (5-20k)
+    { model = 'panto',    label = 'Panto',        class = 'F', price = 6500 },  -- 1er véhicule
     { model = 'blista',   label = 'Blista',       class = 'F', price = 9000 },
-    { model = 'panto',    label = 'Panto',        class = 'F', price = 7500 },
-    { model = 'brioso',   label = 'Brioso R/A',   class = 'F', price = 12000 },
-    { model = 'dilettante', label = 'Dilettante', class = 'F', price = 11000 },
-    { model = 'issi2',    label = 'Issi',         class = 'F', price = 10500 },
+    { model = 'issi2',    label = 'Issi',         class = 'F', price = 11000 },
+    { model = 'dilettante', label = 'Dilettante', class = 'F', price = 13000 }, -- hybride
+    { model = 'brioso',   label = 'Brioso R/A',   class = 'F', price = 16000 },
 
-    -- E — Routière : polyvalentes
-    { model = 'asea',     label = 'Asea',         class = 'E', price = 16000 },
-    { model = 'premier',  label = 'Premier',      class = 'E', price = 18000 },
-    { model = 'sentinel', label = 'Sentinel',     class = 'E', price = 22000 },
-    { model = 'futo',     label = 'Futo',         class = 'E', price = 24000 },
-    { model = 'blista2',  label = 'Blista Compact', class = 'E', price = 19000 },
+    -- E — Routière : polyvalentes du quotidien (20-60k)
+    { model = 'asea',     label = 'Asea',         class = 'E', price = 22000 },
+    { model = 'blista2',  label = 'Blista Compact', class = 'E', price = 26000 },
+    { model = 'premier',  label = 'Premier',      class = 'E', price = 30000 },
+    { model = 'sentinel', label = 'Sentinel',     class = 'E', price = 38000 },
+    { model = 'futo',     label = 'Futo',         class = 'E', price = 45000 },  -- icône drift
 
-    -- D — Berline : confort / statut
-    { model = 'fugitive', label = 'Fugitive',     class = 'D', price = 32000 },
-    { model = 'tailgater', label = 'Tailgater',   class = 'D', price = 38000 },
-    { model = 'oracle',   label = 'Oracle',       class = 'D', price = 42000 },
-    { model = 'schafter2', label = 'Schafter',    class = 'D', price = 48000 },
-    { model = 'warrener', label = 'Warrener',     class = 'D', price = 35000 },
+    -- D — Berline : confort / statut (60-150k)
+    { model = 'warrener', label = 'Warrener',     class = 'D', price = 65000 },
+    { model = 'fugitive', label = 'Fugitive',     class = 'D', price = 78000 },
+    { model = 'tailgater', label = 'Tailgater',   class = 'D', price = 95000 },
+    { model = 'oracle',   label = 'Oracle',       class = 'D', price = 115000 },
+    { model = 'schafter2', label = 'Schafter',    class = 'D', price = 140000 }, -- luxe
 
-    -- C — Tout-terrain : SUV / 4x4
-    { model = 'baller2',  label = 'Baller',       class = 'C', price = 65000 },
-    { model = 'mesa',     label = 'Mesa',         class = 'C', price = 52000 },
-    { model = 'sandking', label = 'Sandking',     class = 'C', price = 70000 },
-    { model = 'rebel2',   label = 'Rebel',        class = 'C', price = 58000 },
-    { model = 'kalahari', label = 'Kalahari',     class = 'C', price = 49000 },
+    -- C — Tout-terrain : SUV / 4x4 robustes (150-400k)
+    { model = 'kalahari', label = 'Kalahari',     class = 'C', price = 160000 },
+    { model = 'mesa',     label = 'Mesa',         class = 'C', price = 200000 },
+    { model = 'rebel2',   label = 'Rebel',        class = 'C', price = 245000 },
+    { model = 'baller2',  label = 'Baller',       class = 'C', price = 310000 }, -- SUV premium
+    { model = 'sandking', label = 'Sandking',     class = 'C', price = 380000 }, -- monster
 
-    -- B — Sportive : performances vives
-    { model = 'sultan',   label = 'Sultan',       class = 'B', price = 95000 },
-    { model = 'kuruma',   label = 'Kuruma',       class = 'B', price = 110000 },
-    { model = 'buffalo',  label = 'Buffalo',      class = 'B', price = 105000 },
-    { model = 'comet2',   label = 'Comet',        class = 'B', price = 135000 },
-    { model = 'elegy2',   label = 'Elegy RH8',    class = 'B', price = 125000 },
+    -- B — Sportive : performances vives (400-900k)
+    { model = 'sultan',   label = 'Sultan',       class = 'B', price = 420000 },
+    { model = 'buffalo',  label = 'Buffalo',      class = 'B', price = 520000 },
+    { model = 'kuruma',   label = 'Kuruma',       class = 'B', price = 640000 },
+    { model = 'elegy2',   label = 'Elegy RH8',    class = 'B', price = 760000 },
+    { model = 'comet2',   label = 'Comet',        class = 'B', price = 880000 },
 
-    -- A — Supersport : haut de gamme piste
-    { model = 'banshee',  label = 'Banshee',      class = 'A', price = 220000 },
-    { model = 'jester',   label = 'Jester',       class = 'A', price = 280000 },
-    { model = 'feltzer2', label = 'Feltzer',      class = 'A', price = 260000 },
-    { model = 'massacro', label = 'Massacro',     class = 'A', price = 310000 },
-    { model = 'sultanrs', label = 'Sultan RS',    class = 'A', price = 350000 },
+    -- A — Supersport : haut de gamme piste (0,9-2M)
+    { model = 'banshee',  label = 'Banshee',      class = 'A', price = 950000 },
+    { model = 'feltzer2', label = 'Feltzer',      class = 'A', price = 1150000 },
+    { model = 'jester',   label = 'Jester',       class = 'A', price = 1400000 },
+    { model = 'massacro', label = 'Massacro',     class = 'A', price = 1650000 },
+    { model = 'sultanrs', label = 'Sultan RS',    class = 'A', price = 1950000 },
 
-    -- S — Hypercar : exclusif
-    { model = 'zentorno', label = 'Zentorno',     class = 'S', price = 725000 },
-    { model = 't20',      label = 'T20',          class = 'S', price = 850000 },
-    { model = 'osiris',   label = 'Osiris',       class = 'S', price = 780000 },
-    { model = 'adder',    label = 'Adder',        class = 'S', price = 900000 },
-    { model = 'entityxf', label = 'Entity XF',    class = 'S', price = 950000 },
+    -- S — Hypercar : exclusivité absolue (2-8M)
+    { model = 'osiris',   label = 'Osiris',       class = 'S', price = 2400000 },
+    { model = 'zentorno', label = 'Zentorno',     class = 'S', price = 3200000 },
+    { model = 't20',      label = 'T20',          class = 'S', price = 4500000 },
+    { model = 'adder',    label = 'Adder',        class = 'S', price = 6000000 },
+    { model = 'entityxf', label = 'Entity XF',    class = 'S', price = 7800000 },
 }
 
 -- ---------------------------------------------------------------------

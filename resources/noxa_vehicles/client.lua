@@ -61,10 +61,12 @@ for _, c in ipairs(Config.Classes) do
             classMenu.Title = c.id
             classMenu.Subtitle = c.label
             for _, entry in ipairs(catalogByClass[c.id] or {}) do
+                local tax   = math.floor(entry.price * (Config.PurchaseTax or 0) + 0.5)
+                local total = entry.price + tax
                 classMenu:AddButton({
                     label = entry.label,
-                    description = ('Acheter pour %s'):format(money(entry.price)),
-                    value = money(entry.price),
+                    description = ('Prix %s + TVA %s = %s'):format(money(entry.price), money(tax), money(total)),
+                    value = money(total),
                     select = function()
                         ESX.TriggerServerCallback('noxa_vehicles:buy', function(res)
                             if not res or not res.ok then

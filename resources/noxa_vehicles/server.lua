@@ -67,7 +67,11 @@ ESX.RegisterServerCallback('noxa_vehicles:buy', function(source, cb, model)
     local entry = CatalogByModel[model]
     if not entry then return cb({ ok = false, reason = 'Modèle indisponible.' }) end
 
-    if not chargePlayer(xPlayer, entry.price) then
+    -- ANTI-INFLATION : TVA prélevée en plus du prix (puits monétaire).
+    local tax   = math.floor(entry.price * (Config.PurchaseTax or 0) + 0.5)
+    local total = entry.price + tax
+
+    if not chargePlayer(xPlayer, total) then
         return cb({ ok = false, reason = 'Fonds insuffisants.' })
     end
 
@@ -84,12 +88,12 @@ ESX.RegisterServerCallback('noxa_vehicles:buy', function(source, cb, model)
             { xPlayer.getIdentifier(), plate, json.encode(props), 'car', 0, 'concession' },
             function(id)
                 if not id then
-                    -- remboursement si l'insert échoue
-                    xPlayer.addAccountMoney('bank', entry.price)
+                    -- remboursement intégral (prix + TVA) si l'insert échoue
+                    xPlayer.addAccountMoney('bank', total)
                     return cb({ ok = false, reason = "Erreur d'enregistrement." })
                 end
-                print(('^2[NOXA VEH]^7 %s a acheté %s (%s) pour $%d'):format(
-                    xPlayer.getName(), entry.label, plate, entry.price))
+                print(('^2[NOXA VEH]^7 %s a acheté %s (%s) pour $%d (dont $%d TVA)'):format(
+                    xPlayer.getName(), entry.label, plate, total, tax))
                 cb({ ok = true, model = model, plate = plate, props = props })
             end)
     end)

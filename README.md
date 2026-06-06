@@ -15,7 +15,7 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
 - **`noxa_admin`** — menu admin ultra complet **menuv** (F10) + **/report** joueur→staff + **prise de service** (/duty)
 - **`noxa_vehicles`** — **véhicules** : concession (7 classes F→S), garages, fourrière, carburant (2$/%) — 100% ESX natif (`owned_vehicles`, `ESX.Game`)
 - **`noxa_drugs`** — **drogues** : champs de culture, laboratoires (**menuv**), revendeurs marché noir (`black_money`) — 100% ESX natif (inventaire `xPlayer`)
-- **`noxa_updater`** — **auto-update lié à GitHub** : commande console `install noxa` (sync base via oxmysql + migrations idempotentes + reload des ressources). Voir *Mettre à jour le serveur*.
+- **`noxa_updater`** — **auto-update lié à GitHub** : commande console `noxa update` (sync base via oxmysql + migrations idempotentes + reload des ressources). Voir *Mettre à jour le serveur*.
 
 ## Installation (première fois)
 1. **Cloner le repo dans le dossier de ton serveur** (recommandé — c'est ce qui rend
@@ -28,7 +28,7 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
    > puissent faire le `git pull` au bon endroit.
 2. Importer **`install.sql`** (racine) dans ta base MySQL `noxa` (phpMyAdmin) — **fichier unique** : ESX complet + toutes les tables custom Noxa (`noxa_reports`, `noxa_admin_logs`, `noxa_warns`, `noxa_bans`, `noxa_migrations`, phone, anti-cheat...). Idempotent (réimport sans risque).
 3. Ouvrir `server.cfg` — remplir `sv_licenseKey` + `mysql_connection_string`.
-   ⚠️ Garder **`multipleStatements=true`** dans la chaîne de connexion (requis par `install noxa`).
+   ⚠️ Garder **`multipleStatements=true`** dans la chaîne de connexion (requis par `noxa update`).
 4. Vérifier que `resources/` est en place (livré par le clone).
 5. Ajouter `exec server.cfg`, ou utiliser ce server.cfg. Démarrer.
 
@@ -46,15 +46,15 @@ Après la première install, **plus jamais besoin de re-télécharger ni de ré-
    - **synchronise** `install.sql` + `sql/migrations/` dans `resources/noxa_updater/sql/` (le seul emplacement que le serveur a le droit de lire, sandbox oblige).
 2. **Dans la console serveur** (txAdmin / RCON / live console) :
    ```
-   install noxa
+   noxa update
    ```
    - **Base** : (re)joue `install.sql` si besoin (idempotent, via une *baseline*) puis applique **chaque migration une seule fois** (suivi dans la table `noxa_migrations`), le tout via **oxmysql** ;
    - **Ressources** : `refresh` → **ensure/restart** les ressources changées, **stop** celles retirées du repo ;
    - **Rapport console** clair : *Ajoutées / Mises à jour / Supprimées* + résumé SQL.
 
-> 🔒 `install noxa` est **réservée à la console** (`source == 0`) ou aux détenteurs de l'ACE **`noxa.updater`** (jamais un joueur).
+> 🔒 `noxa update` est **réservée à la console** (`source == 0`) ou aux détenteurs de l'ACE **`noxa.updater`** (jamais un joueur).
 >
-> 🧩 **Ajouter une migration** (modifier une table existante sur des bases déjà importées) : créer `sql/migrations/NNN_description.sql` (idempotent — voir `sql/migrations/README.md`), relancer `update.sh`, puis `install noxa`. Les **nouvelles tables** vont toujours dans `install.sql` (jamais de `.sql` dispersé dans les ressources).
+> 🧩 **Ajouter une migration** (modifier une table existante sur des bases déjà importées) : créer `sql/migrations/NNN_description.sql` (idempotent — voir `sql/migrations/README.md`), relancer `update.sh`, puis `noxa update`. Les **nouvelles tables** vont toujours dans `install.sql` (jamais de `.sql` dispersé dans les ressources).
 
 ## Menu Admin (`noxa_admin`)
 - **Accès staff** : groupes ESX `mod < admin < superadmin`, ou ACE `noxa.admin`. Grade revérifié server-side à **chaque** action.
@@ -175,5 +175,5 @@ F **5-20k** · E **20-60k** · D **60-150k** · C **150-400k** · B **400-900k**
 | Véhicules & Garages | ✅ | ESX natif (`owned_vehicles`) · concession 7 classes F→S · garages · fourrière · carburant 2$/% |
 | Drogues | ✅ | ESX natif · cultures (E) · transformation menuv · vente revendeurs (black_money) · anti-farm/anti-dupe server-side |
 | Économie & Prix | ✅ | salaires $/h (civil/légal) · prix véhicules F→S calés · TVA 15% + puits monétaires anti-inflation |
-| Auto-update (`install noxa`) | ✅ | `update.sh`/`update.bat` (git) + commande console : sync base oxmysql · migrations idempotentes (`noxa_migrations`) · reload ressources (ajoutées/maj/supprimées) · rapport |
+| Auto-update (`noxa update`) | ✅ | `update.sh`/`update.bat` (git) + commande console : sync base oxmysql · migrations idempotentes (`noxa_migrations`) · reload ressources (ajoutées/maj/supprimées) · rapport |
 > ✅ Fonctionnel · 🟡 En cours · ❌ Non démarré

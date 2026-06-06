@@ -6,10 +6,10 @@
 #    2) calcule le diff des ressources (ajoutées / modifiées / supprimées)
 #    3) synchronise install.sql + sql/migrations/ dans noxa_updater
 #       (seul emplacement lisible par le serveur FiveM, sandbox oblige)
-#  Ensuite, dans la console serveur :  install noxa
+#  Ensuite, dans la console serveur :  noxa update
 #
 #  Le Lua serveur FiveM est sandboxé (os.execute bloqué) : c'est CE script
-#  qui fait le git. La partie base + reload se fait via `install noxa`.
+#  qui fait le git. La partie base + reload se fait via `noxa update`.
 # =====================================================================
 set -euo pipefail
 
@@ -149,5 +149,5 @@ say "SQL synchronisé (install.sql + $count migration(s))."
 
 echo
 say "✅ Fichiers à jour. Dans la console serveur, tape maintenant :"
-printf '\033[32m    install noxa\033[0m\n'
+printf '\033[32m    noxa update\033[0m\n'
 say "   (synchronise la base puis recharge les ressources modifiées)."

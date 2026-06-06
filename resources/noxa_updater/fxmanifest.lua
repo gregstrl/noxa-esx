@@ -1,6 +1,6 @@
 -- =====================================================================
 --  NOXA UPDATER — Auto-update lié à GitHub (gregstrl/noxa-esx)
---  Commande console : `install noxa`
+--  Commande console : `noxa update`
 --   1) Synchronise la base `noxa` (install.sql + sql/migrations) via oxmysql,
 --      idempotent, chaque migration jouée une seule fois (table noxa_migrations).
 --   2) refresh + ensure/restart des ressources modifiées/ajoutées, stop des

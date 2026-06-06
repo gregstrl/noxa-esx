@@ -12,7 +12,7 @@ Mais quand une base est **déjà importée** chez un joueur et qu'on doit modifi
 une table existante (ajouter une colonne, renommer un champ, créer un index…),
 on ne peut pas se contenter de `CREATE TABLE IF NOT EXISTS`. C'est le rôle des
 **migrations** : chaque fichier `.sql` numéroté est joué **une seule fois**, dans
-l'ordre, par la commande console `install noxa` (ressource `noxa_updater`).
+l'ordre, par la commande console `noxa update` (ressource `noxa_updater`).
 
 Le suivi se fait dans la table `noxa_migrations` (nom du fichier + date). Une
 migration déjà présente dans cette table n'est jamais rejouée.
@@ -31,7 +31,7 @@ migration déjà présente dans cette table n'est jamais rejouée.
 4. Après avoir édité une migration ou `install.sql`, lance `update.sh`
    (ou `update.bat`) : il resynchronise ces fichiers dans
    `resources/noxa_updater/sql/` (le seul endroit que le sandbox FiveM autorise
-   à lire), puis tape `install noxa` dans la console serveur.
+   à lire), puis tape `noxa update` dans la console serveur.
 
 ## Template d'une migration idempotente (ajout de colonne)
 

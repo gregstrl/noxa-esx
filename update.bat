@@ -5,10 +5,10 @@ REM  Met a jour le serveur depuis GitHub (gregstrl/noxa-esx) :
 REM    1) git fetch + reset --hard origin/main
 REM    2) calcule le diff des ressources -> sync\state.txt
 REM    3) synchronise install.sql + sql\migrations dans noxa_updater
-REM  Ensuite, dans la console serveur :  install noxa
+REM  Ensuite, dans la console serveur :  noxa update
 REM
 REM  Le Lua serveur FiveM est sandboxe (os.execute bloque) : c'est CE
-REM  script qui fait le git. La base + reload se font via `install noxa`.
+REM  script qui fait le git. La base + reload se font via `noxa update`.
 REM =====================================================================
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
@@ -99,6 +99,6 @@ echo [noxa update] SQL synchronise ^(install.sql + migrations^).
 
 echo.
 echo [noxa update] OK. Dans la console serveur, tape maintenant :
-echo     install noxa
+echo     noxa update
 echo    ^(synchronise la base puis recharge les ressources modifiees^).
 endlocal

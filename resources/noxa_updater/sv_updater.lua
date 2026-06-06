@@ -1,6 +1,6 @@
 -- =====================================================================
 --  NOXA UPDATER — sv_updater.lua
---  Commande console : `install noxa`
+--  Commande console : `noxa update`
 --
 --  Contraintes FiveM respectées :
 --   - os.execute / io.popen sont sandboxés -> AUCUN git ici (voir update.sh).
@@ -178,7 +178,7 @@ local function readState()
         elseif tag == 'M' then st.modified[#st.modified + 1] = name
         elseif tag == 'D' then st.removed[#st.removed + 1] = name end
     end
-    -- consomme l'état pour ne pas le rejouer au prochain `install noxa`.
+    -- consomme l'état pour ne pas le rejouer au prochain `noxa update`.
     SaveResourceFile(RES, STATE_FILE, '', -1)
     return st
 end
@@ -275,7 +275,7 @@ local function printReport(report)
 end
 
 -- ---------------------------------------------------------------------
---  COMMANDE : install noxa
+--  COMMANDE : noxa update
 -- ---------------------------------------------------------------------
 local running = false
 
@@ -311,11 +311,11 @@ local function runInstall(source)
 end
 
 -- restricted = true : seuls la console (source 0) et les détenteurs de l'ACE
--- `command.install` peuvent l'appeler. On verrouille en plus sur noxa.updater.
-RegisterCommand('install', function(source, args)
-    if (args[1] or ''):lower() ~= 'noxa' then
+-- `command.noxa` peuvent l'appeler. On verrouille en plus sur noxa.updater.
+RegisterCommand('noxa', function(source, args)
+    if (args[1] or ''):lower() ~= 'update' then
         if source == 0 then
-            log('Usage : install noxa')
+            log('Usage : noxa update')
         end
         return
     end
@@ -328,4 +328,4 @@ RegisterCommand('install', function(source, args)
     runInstall(source)
 end, true)
 
-log('Prêt. Tape `install noxa` dans la console pour synchroniser le serveur avec GitHub.')
+log('Prêt. Tape `noxa update` dans la console pour synchroniser le serveur avec GitHub.')

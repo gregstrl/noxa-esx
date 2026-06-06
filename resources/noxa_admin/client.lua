@@ -356,6 +356,7 @@ local tpLocMenu       = MenuV:CreateMenu('Lieux', 'Téléportation rapide', 'top
 local vehMenu         = MenuV:CreateMenu('Véhicules', 'Gestion véhicules', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
 local ecoMenu         = MenuV:CreateMenu('Économie', 'Gestion argent', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
 local ecoPickMenu     = MenuV:CreateMenu('Économie', 'Choisir un joueur', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
+local ecoActMenu      = MenuV:CreateMenu('Économie', 'Actions argent', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
 local jobsMenu        = MenuV:CreateMenu('Jobs', 'Choisir un joueur', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
 local jobListMenu     = MenuV:CreateMenu('Jobs', 'Choisir un job', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
 local sanctionsMenu   = MenuV:CreateMenu('Sanctions', 'Warns & bans', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
@@ -367,7 +368,7 @@ local reportActMenu   = MenuV:CreateMenu('Report', 'Actions', 'topleft', 245, 65
 local panelsMenu      = MenuV:CreateMenu('Panels NUI', 'Interfaces Noxa', 'topleft', 245, 65, 65, 'size-110', 'default', 'menuv', 'native')
 
 -- État de sélection courant
-local selected = { player = nil, job = nil, report = nil }
+local selected = { player = nil, job = nil, report = nil, ecoPlayer = nil }
 
 -- ---------- MENU PRINCIPAL ----------
 mainMenu:AddButton({ icon = '👥', label = 'Joueurs', value = playersMenu, description = 'Liste & actions joueurs' })
@@ -598,18 +599,46 @@ ecoPickMenu:On('open', function(m)
     lastMenu = m
     m:ClearItems()
     ESX.TriggerServerCallback('noxa_admin:getPlayers', function(players)
+        if #players == 0 then m:AddButton({ label = 'Aucun joueur', disabled = true }); return end
         for _, p in ipairs(players) do
-            m:AddButton({ label = ('[%d] %s'):format(p.id, p.name), description = ('$%s | banque $%s'):format(p.cash, p.bank),
-                select = function()
-                    openPrompt('Argent — ' .. p.name, {
-                        { name = 'account', label = 'Compte (money/bank/black_money)', type = 'text', value = 'bank' },
-                        { name = 'amount', label = 'Montant à donner (négatif impossible)', type = 'number', value = '0' },
-                    }, function(v)
-                        if v then TriggerServerEvent('noxa_admin:giveMoney', p.id, v.account, v.amount) end
-                    end)
-                end })
+            m:AddButton({ label = ('[%d] %s'):format(p.id, p.name), value = ecoActMenu,
+                description = ('$%s | banque $%s'):format(p.cash, p.bank),
+                select = function() selected.ecoPlayer = p end })
         end
     end)
+end)
+
+-- Actions argent pour le joueur sélectionné (voir solde / donner)
+ecoActMenu:On('open', function(m)
+    lastMenu = m
+    m:ClearItems()
+    local p = selected.ecoPlayer
+    if not p then m:AddButton({ label = 'Aucun joueur', disabled = true }); return end
+    m.Subtitle = ('[%d] %s'):format(p.id, p.name)
+
+    m:AddButton({ icon = '🔎', label = 'Voir solde (live)', select = function()
+        ESX.TriggerServerCallback('noxa_admin:getBalance', function(b)
+            if not b then return notify('~r~Joueur introuvable.') end
+            notify(('~b~Solde de %s :\n~g~Cash : $%s\n~g~Banque : $%s\n~r~Sale : $%s')
+                :format(b.name, b.cash, b.bank, b.black))
+        end, p.id)
+    end })
+    m:AddButton({ icon = '💸', label = 'Donner de l\'argent', select = function()
+        openPrompt('Donner — ' .. p.name, {
+            { name = 'account', label = 'Compte (money/bank/black_money)', type = 'text', value = 'bank' },
+            { name = 'amount', label = 'Montant à donner', type = 'number', value = '0' },
+        }, function(v)
+            if v then TriggerServerEvent('noxa_admin:giveMoney', p.id, v.account, v.amount) end
+        end)
+    end })
+    m:AddButton({ icon = '💵', label = 'Set argent (admin)', select = function()
+        openPrompt('Set argent — ' .. p.name, {
+            { name = 'account', label = 'Compte (money/bank/black_money)', type = 'text', value = 'bank' },
+            { name = 'amount', label = 'Nouveau montant', type = 'number', value = '0' },
+        }, function(v)
+            if v then TriggerServerEvent('noxa_admin:setMoney', p.id, v.account, v.amount) end
+        end)
+    end })
 end)
 
 -- ---------- JOBS ----------

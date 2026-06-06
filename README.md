@@ -12,20 +12,28 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
   - `noxa_gestion` — panel gestion serveur (F9, superadmin)
   - `noxa_phone` — téléphone (F1)
   - `noxa_inventaire` — inventaire (I)
-  - `noxa_boutique` — boutique (F7)
+- **`noxa_admin`** — menu admin ultra complet **menuv** (F10) + **/report** joueur→staff + **prise de service** (/duty)
 
 ## Installation
-1. Importer `[SQL]/legacy.sql` puis `[SQL]/noxa_phone.sql` dans ta base MySQL `noxa` (phpMyAdmin)
+1. Importer **`install.sql`** (racine) dans ta base MySQL `noxa` (phpMyAdmin) — **fichier unique** : ESX complet + toutes les tables custom Noxa (`noxa_reports`, `noxa_admin_logs`, `noxa_warns`, `noxa_bans`, phone, anti-cheat...). Idempotent (réimport sans risque).
 2. Ouvrir `server.cfg` — remplir `sv_licenseKey` + `mysql_connection_string`
 3. Placer le dossier `resources/` dans ton serveur FiveM
 4. Ajouter `exec server.cfg` dans ton serveur, ou utiliser ce server.cfg
 5. Démarrer
 
+## Menu Admin (`noxa_admin`)
+- **Accès staff** : groupes ESX `mod < admin < superadmin`, ou ACE `noxa.admin`. Grade revérifié server-side à **chaque** action.
+- **F10** : menu menuv (Joueurs · Moi/Staff · Téléportation · Véhicules · Économie · Jobs · Sanctions · Annonces · Météo & Temps · Reports · Panels NUI).
+- **/duty** : prise de service on/off. En service → réception des `/report` en live, staff chat, spectate/noclip.
+- **/report `<message>`** : signalement joueur → notif live à tout le staff en service (anti-spam 30 s). Sous-menu Reports : TP, spectate, claim, répondre, clôturer.
+- Actions sensibles (set argent, ban permanent, météo/heure, annonces) = **admin/superadmin** uniquement.
+- Toute action sensible journalisée dans `noxa_admin_logs` (+ console).
+
 ## Architecture
 - ESX Legacy = base intacte. On construit PAR-DESSUS, on ne réinvente rien.
 - Tout script ESX du marché se drop dans `resources/` et fonctionne direct.
-- Les menus in-game custom passent par `exports['menuv']`.
-- Les 5 panels NUI = ressources indépendantes, visuels figés, données branchées par-dessus.
+- Les menus in-game custom passent par **menuv** (`@menuv/menuv.lua` → global `MenuV`).
+- Les panels NUI = ressources indépendantes, visuels figés, données branchées par-dessus.
 
 ## État
 | Système | État | Notes |
@@ -34,4 +42,5 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
 | Panels NUI (visuels) | ✅ | anti-cheat, phone, gestion, inventaire, boutique |
 | Liaison données panels | 🟡 | phone lié au serveur ESX (contacts, SMS, banque, Canari, garage) · autres en cours |
 | Téléphone (F1) | ✅ | données live ESX/SQL, envoi SMS + tweets, ouverture/fermeture |
+| Menu admin (F10) | ✅ | menuv natif · reports · prise de service · sanctions · logs · grade vérifié server-side |
 > ✅ Fonctionnel · 🟡 En cours · ❌ Non démarré

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NOXA ADMIN</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: transparent; }
+
+  /* ---- Prompt de saisie ---- */
+  #overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    align-items: center; justify-content: center;
+  }
+  #overlay.show { display: flex; }
+  #prompt {
+    width: 420px; max-width: 90vw;
+    background: #16181d;
+    border: 1px solid #2a2d35;
+    border-top: 4px solid #f54141;
+    border-radius: 10px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.6);
+    padding: 22px 24px;
+    color: #e8e8ea;
+  }
+  #prompt h2 { font-size: 18px; margin-bottom: 16px; color: #fff; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; color: #9aa0ab; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+  .field input {
+    width: 100%; padding: 10px 12px;
+    background: #0f1115; border: 1px solid #2a2d35; border-radius: 6px;
+    color: #fff; font-size: 14px; outline: none;
+  }
+  .field input:focus { border-color: #f54141; }
+  .btns { display: flex; gap: 10px; margin-top: 8px; }
+  .btns button {
+    flex: 1; padding: 11px; border: none; border-radius: 6px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  #ok { background: #f54141; color: #fff; }
+  #ok:hover { background: #ff5757; }
+  #cancel { background: #2a2d35; color: #cfd2d8; }
+  #cancel:hover { background: #353944; }
+
+  /* ---- Bannière d'annonce ---- */
+  #announce {
+    display: none;
+    position: fixed; top: 8%; left: 50%; transform: translateX(-50%);
+    min-width: 420px; max-width: 70vw;
+    background: linear-gradient(135deg, #b71c1c, #f54141);
+    color: #fff; padding: 18px 28px; border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    text-align: center; animation: drop .4s ease;
+  }
+  #announce.show { display: block; }
+  #announce .ttl { font-size: 13px; letter-spacing: 2px; opacity: .85; text-transform: uppercase; margin-bottom: 6px; }
+  #announce .txt { font-size: 20px; font-weight: 700; }
+  @keyframes drop { from { transform: translate(-50%, -40px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+</style>
+</head>
+<body>
+  <!-- Prompt -->
+  <div id="overlay">
+    <div id="prompt">
+      <h2 id="prompt-title">Saisie</h2>
+      <div id="fields"></div>
+      <div class="btns">
+        <button id="cancel">Annuler</button>
+        <button id="ok">Valider</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Annonce -->
+  <div id="announce">
+    <div class="ttl">📢 Annonce serveur</div>
+    <div class="txt" id="announce-text"></div>
+  </div>
+
+<script>
+  const RES = 'noxa_admin';
+  const overlay = document.getElementById('overlay');
+  const fieldsBox = document.getElementById('fields');
+  let curFields = [];
+
+  function post(name, data) {
+    return fetch(`https://${RES}/${name}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify(data || {})
+    }).catch(() => {});
+  }
+
+  function openPrompt(title, fields) {
+    curFields = fields || [];
+    document.getElementById('prompt-title').textContent = title || 'Saisie';
+    fieldsBox.innerHTML = '';
+    curFields.forEach((f, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'field';
+      const lbl = document.createElement('label');
+      lbl.textContent = f.label || f.name;
+      const inp = document.createElement('input');
+      inp.type = (f.type === 'number') ? 'number' : 'text';
+      inp.id = 'f_' + i;
+      inp.value = (f.value !== undefined && f.value !== null) ? f.value : '';
+      wrap.appendChild(lbl); wrap.appendChild(inp);
+      fieldsBox.appendChild(wrap);
+    });
+    overlay.classList.add('show');
+    const first = document.getElementById('f_0');
+    if (first) setTimeout(() => first.focus(), 30);
+  }
+
+  function submit() {
+    const values = {};
+    curFields.forEach((f, i) => {
+      values[f.name] = document.getElementById('f_' + i).value;
+    });
+    overlay.classList.remove('show');
+    post('promptSubmit', { values });
+  }
+
+  function cancel() {
+    overlay.classList.remove('show');
+    post('promptCancel', {});
+  }
+
+  document.getElementById('ok').addEventListener('click', submit);
+  document.getElementById('cancel').addEventListener('click', cancel);
+
+  document.addEventListener('keydown', (e) => {
+    if (!overlay.classList.contains('show')) return;
+    if (e.key === 'Enter') { e.preventDefault(); submit(); }
+    else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+  });
+
+  let announceTimer = null;
+  function showAnnounce(text) {
+    document.getElementById('announce-text').textContent = text || '';
+    const el = document.getElementById('announce');
+    el.classList.add('show');
+    if (announceTimer) clearTimeout(announceTimer);
+    announceTimer = setTimeout(() => el.classList.remove('show'), 9000);
+  }
+
+  window.addEventListener('message', (ev) => {
+    const d = ev.data || {};
+    if (d.action === 'prompt') openPrompt(d.title, d.fields);
+    else if (d.action === 'announce') showAnnounce(d.text);
+  });
+</script>
+</body>
+</html>

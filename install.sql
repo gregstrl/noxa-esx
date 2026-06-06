@@ -1187,3 +1187,66 @@ SET @has_new := (SELECT COUNT(*) FROM information_schema.COLUMNS
 SET @s := IF(@has_new = 0,
   'ALTER TABLE `noxa_phone_tweets` ADD COLUMN `retweets` INT(11) NOT NULL DEFAULT 0', 'DO 0');
 PREPARE stmt FROM @s; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- =====================================================================
+--  MENU ADMIN NOXA (ressource noxa_admin)
+--  Reports joueurs · journal des actions staff · warns · bans
+-- =====================================================================
+
+-- Reports : file d'attente des signalements joueurs -> staff
+CREATE TABLE IF NOT EXISTS `noxa_reports` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `identifier` VARCHAR(64) NOT NULL,
+  `player_name` VARCHAR(64) NOT NULL,
+  `message` TEXT NOT NULL,
+  `position` VARCHAR(64) DEFAULT NULL,
+  `status` VARCHAR(16) NOT NULL DEFAULT 'open',   -- open | claimed | closed
+  `claimed_by` VARCHAR(64) DEFAULT NULL,           -- nom du staff assigné
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `closed_at` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_ident` (`identifier`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Journal des actions staff (qui, quoi, cible, quand)
+CREATE TABLE IF NOT EXISTS `noxa_admin_logs` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `staff_identifier` VARCHAR(64) DEFAULT NULL,
+  `staff_name` VARCHAR(64) DEFAULT NULL,
+  `action` VARCHAR(48) NOT NULL,
+  `target_identifier` VARCHAR(64) DEFAULT NULL,
+  `target_name` VARCHAR(64) DEFAULT NULL,
+  `details` TEXT DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_staff` (`staff_identifier`),
+  KEY `idx_action` (`action`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Avertissements (warns) stockés par joueur
+CREATE TABLE IF NOT EXISTS `noxa_warns` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `identifier` VARCHAR(64) NOT NULL,
+  `player_name` VARCHAR(64) DEFAULT NULL,
+  `staff_name` VARCHAR(64) DEFAULT NULL,
+  `reason` TEXT NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_ident` (`identifier`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Bans (expire NULL = bannissement permanent)
+CREATE TABLE IF NOT EXISTS `noxa_bans` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `identifier` VARCHAR(64) DEFAULT NULL,
+  `license` VARCHAR(64) DEFAULT NULL,
+  `player_name` VARCHAR(64) DEFAULT NULL,
+  `staff_name` VARCHAR(64) DEFAULT NULL,
+  `reason` TEXT NOT NULL,
+  `expire` TIMESTAMP NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_ident` (`identifier`),
+  KEY `idx_license` (`license`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

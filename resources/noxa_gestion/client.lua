@@ -21,6 +21,7 @@ local function closePanel()
     if not isOpen then return end
     isOpen = false
     SetNuiFocus(false, false)
+    SendNUIMessage({ action = 'close' })   -- masque reellement la NUI (sinon overlay noir permanent)
 end
 
 -- --- Callbacks NUI (le bundle fetch « noxa_manage » -> bridge.js redirige ici) ---

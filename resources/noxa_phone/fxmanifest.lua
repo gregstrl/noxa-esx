@@ -6,7 +6,10 @@ description 'NOXA FA — Téléphone (NUI) lié à ESX Legacy'
 version '1.1.0'
 
 ui_page 'html/index.html'
-files { 'html/index.html' }
+files {
+    'html/index.html',
+    'html/bridge.js',   -- fix overlay noir (transparence + masquage a la fermeture)
+}
 
 client_script 'client.lua'
 

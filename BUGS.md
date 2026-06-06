@@ -7,16 +7,11 @@
 ---
 
 ## 🔴 CRITIQUE
-
-### [BUG-13] Panels NUI — overlay noir permanent (NUI pas masquée à la fermeture)
-- **Symptôme** : un fond noir/sombre des panels reste affiché par-dessus le jeu en permanence (visible même panel "fermé"). Problème UI FiveM connu — PAS un souci de CSS background.
-- **Cause** : les panels noxa_* (anticheat, gestion, phone, inventaire) utilisent le format auto-rendu « Claude Design `__bundler` » : le fichier index.html contient un loader (`__bundler_thumbnail` + "Unpacking...") qui REMPLACE tout le document par la vraie app React (`<html data-theme="dark">`, fond opaque #0b0b0d/#0f0f12). Or un `ui_page` FiveM est TOUJOURS rendu. `SetNuiFocus(false,false)` à la fermeture retire seulement la souris/clavier, **ne cache PAS la page**. L'app React swappée n'écoute pas le message `close` pour se masquer → l'UI opaque sombre reste dessinée = overlay noir permanent. Classique « NUI not hidden on close ».
-- **Fix (NE PAS toucher au layout/design figé)** :
-  1. Masquer réellement la NUI quand fermée. Script compagnon (bridge.js / nui.js dans files{}) qui SURVIT au swap du __bundler (attacher sur window, ou MutationObserver, ou ré-appliquer après le replace) et : racine `display:none` par défaut ; sur message window action 'open'/'noxaData' → afficher ; action 'close' → `display:none`. Toggle sur document.documentElement ou un wrapper plein écran, JAMAIS sur la carte du design.
-  2. Défensif : `html,body{ background:transparent !important; }` (pour qu'un rendu bref laisse voir le jeu) — mais le fix PRINCIPAL est le display:none-à-la-fermeture.
-  3. noxa_phone n'a pas de bridge.js → en ajouter un.
-  - Le client.lua envoie déjà action 'open'/'close' : il manque juste le masquage côté page.
-- **Fichiers** : `resources/noxa_anticheat|noxa_gestion|noxa_phone|noxa_inventaire/html/` (bridge) — client.lua OK.
+_(aucun)_
 
 ## 🟡 MINEUR
-_(aucun)_
+
+### [BUG-13] Panels NUI — overlay noir / jeu non visible derrière — FIX APPLIQUÉ, à vérifier en jeu
+- **État** : fix appliqué aux 4 panels (anticheat, gestion, phone, inventaire) via bridge.js : masquage réel `display:none` à la fermeture + transparence html/body + neutralisation générique de tout backdrop plein écran (≥92% viewport → scrim rgba + blur). Gestion : ajout du `SendNUIMessage close` manquant. Phone : bridge.js créé + référencé.
+- **À CONFIRMER en jeu** (après mise à jour des fichiers serveur) : (1) plus d'overlay noir quand un panel est fermé ; (2) on voit bien le jeu (flouté) derrière chaque panel ouvert. Si un panel reste noir : le détecteur générique de backdrop n'a pas attrapé le bon conteneur → inspecter le DOM rendu de CE panel et cibler son conteneur plein écran précis (sans toucher à la carte du design). Ne PAS modifier le layout figé.
+- **Fichiers** : `resources/noxa_*/html/bridge.js`.

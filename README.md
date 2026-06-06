@@ -13,6 +13,7 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
   - `noxa_phone` — téléphone (F1)
   - `noxa_inventaire` — inventaire (I)
 - **`noxa_admin`** — menu admin ultra complet **menuv** (F10) + **/report** joueur→staff + **prise de service** (/duty)
+- **`noxa_vehicles`** — **véhicules** : concession (7 classes F→S), garages, fourrière, carburant (2$/%) — 100% ESX natif (`owned_vehicles`, `ESX.Game`)
 
 ## Installation
 1. Importer **`install.sql`** (racine) dans ta base MySQL `noxa` (phpMyAdmin) — **fichier unique** : ESX complet + toutes les tables custom Noxa (`noxa_reports`, `noxa_admin_logs`, `noxa_warns`, `noxa_bans`, phone, anti-cheat...). Idempotent (réimport sans risque).
@@ -44,6 +45,21 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
   → **Ajouter un item** : déposer son PNG `html/images/<name>.png` (le `files{}` du fxmanifest
   charge `html/images/*.png`, aucune autre étape).
 
+## Véhicules (`noxa_vehicles`)
+100% **ESX natif** — utilise la table ESX `owned_vehicles` et `ESX.Game` (props véhicule).
+Tout passe par le serveur (argent, ownership, plaques) : le client n'affiche que du validé.
+- **Concession** (Premium Deluxe, marqueur + ped) : catalogue **menuv** regroupé par **7 classes F→S**
+  (`F` Citadine → `S` Hypercar), prix justifiés par segment (≈9k$ → >900k$). Achat débité
+  server-side (banque puis cash), plaque unique générée, ligne `owned_vehicles` créée, véhicule livré.
+- **Garages** (Légion, Sandy) : menu **menuv** des véhicules possédés. **Sortir** un véhicule stocké
+  (spawn + restitution des props/carburant), **Ranger** le véhicule courant (persiste les props ESX,
+  carburant inclus). `stored` géré en base, ownership revérifié à chaque action.
+- **Fourrière** : véhicules `pound` saisis, **récupération contre amende** (500$) → replacés au garage.
+- **Carburant** : `fuelLevel` **persisté nativement** dans les props ESX (`owned_vehicles.vehicle`).
+  Consommation moteur selon le régime ; plein aux stations-service à **2$/%** (débité server-side).
+- **Touche d'interaction** : `E` aux marqueurs (concession / garage / fourrière / pompe).
+- **Ajouter un véhicule au catalogue** : une ligne dans `Config.Catalog` (`model`, `label`, `class`, `price`).
+
 ## Architecture
 - ESX Legacy = base intacte. On construit PAR-DESSUS, on ne réinvente rien.
 - Tout script ESX du marché se drop dans `resources/` et fonctionne direct.
@@ -59,4 +75,5 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
 | Téléphone (F1) | ✅ | données live ESX/SQL, envoi SMS + tweets, ouverture/fermeture |
 | Inventaire (I) | ✅ | inventaire ESX live + **images d'items** · utiliser / jeter / donner (anti-dupe serveur) |
 | Menu admin (F10) | ✅ | menuv natif · reports · prise de service · sanctions · logs · grade vérifié server-side |
+| Véhicules & Garages | ✅ | ESX natif (`owned_vehicles`) · concession 7 classes F→S · garages · fourrière · carburant 2$/% |
 > ✅ Fonctionnel · 🟡 En cours · ❌ Non démarré

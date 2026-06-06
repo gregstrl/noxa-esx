@@ -98,6 +98,16 @@ local function pushLog(tag, level, msg)
     while #acLogs > Config.keepLogs do table.remove(acLogs) end
 end
 
+-- Audit durable : table noxa_ac_logs (survit aux redémarrages, contrairement
+-- au ring buffer mémoire). On y persiste les détections et les sanctions
+-- staff (violation = type, score = confiance, action = flag/kick/ban/warn...).
+local function logDb(identifier, name, violation, score, action)
+    MySQL.insert(
+        'INSERT INTO noxa_ac_logs (identifier, name, violation, score, action) VALUES (?,?,?,?,?)',
+        { identifier, name, violation, math.floor(tonumber(score) or 0), action }
+    )
+end
+
 -- ------------------------------------------------------ TRUST / FLAGS
 -- flags = nb de détections non résolues pour ce joueur ; trust en dérive.
 local function flagsFor(identifier)
@@ -293,7 +303,10 @@ local function addDetection(src, dtype, severity, confidence, detail)
         { ref, dtype, identifier, name, src, severity, 'open', confidence, detail }
     )
 
-    if Config.autoKick and confidence >= Config.autoKickConf then
+    local autoKicked = Config.autoKick and confidence >= Config.autoKickConf
+    logDb(identifier, name, dtype, confidence, autoKicked and 'kick' or 'flag')
+
+    if autoKicked then
         pushLog('KICK', 'warn', ('Auto-kick : %s (#%s) — %s'):format(name, src, dtype))
         DropPlayer(tostring(src), ('NOXA AC — Expulsion automatique : %s'):format(dtype))
     end
@@ -417,10 +430,12 @@ RegisterNetEvent('noxa_ac:action', function(data)
     recordStaffAction(src)
 
     if action == 'resolve' and detId then
+        local rId, rName
         for _, d in ipairs(detections) do
-            if d.id == detId then d.status = 'resolved' break end
+            if d.id == detId then d.status = 'resolved'; rId, rName = d.identifier, d.player; break end
         end
         MySQL.update('UPDATE noxa_ac_detections SET status = ? WHERE ref = ?', { 'resolved', detId })
+        logDb(rId, rName, 'Détection ' .. detId .. ' (par ' .. byName .. ')', 0, 'resolve')
         pushLog('ACTION', 'info', ('Détection %s résolue par %s'):format(detId, byName))
         buildAndPush()
         return
@@ -437,13 +452,16 @@ RegisterNetEvent('noxa_ac:action', function(data)
             watchlist[tId] = { pid = target, name = tName, since = nowMs(),
                 note = ('Ajouté à la surveillance par %s.'):format(byName), by = byName }
         end
+        logDb(tId, tName, 'Surveillance (par ' .. byName .. ')', 0, 'watch')
         pushLog('ACTION', 'warn', ('Watchlist + : %s (#%s) par %s'):format(tName, target, byName))
 
     elseif action == 'warn' then
         TriggerClientEvent('esx:showNotification', target, '~r~Avertissement staff~s~ : comportement signalé.')
+        logDb(tId, tName, 'Avertissement (par ' .. byName .. ')', 0, 'warn')
         pushLog('ACTION', 'warn', ('Avertissement -> %s (#%s) par %s'):format(tName, target, byName))
 
     elseif action == 'kick' then
+        logDb(tId, tName, 'Expulsion staff (par ' .. byName .. ')', 0, 'kick')
         pushLog('KICK', 'warn', ('Expulsion : %s (#%s) par %s'):format(tName, target, byName))
         DropPlayer(tostring(target), 'NOXA AC — Expulsé par le staff.')
 
@@ -454,6 +472,7 @@ RegisterNetEvent('noxa_ac:action', function(data)
             'INSERT INTO noxa_bans (identifier, license, player_name, staff_name, reason, expire) VALUES (?,?,?,?,?,NULL)',
             { tId, tLic, tName, byName, 'Sanction Anti-Cheat (staff)' }
         )
+        logDb(tId, tName, 'Ban permanent (par ' .. byName .. ')', 0, 'ban')
         pushLog('BAN', 'critical', ('Ban permanent : %s (#%s) par %s'):format(tName, target, byName))
         DropPlayer(tostring(target), 'NOXA AC — Banni par le staff.')
     end

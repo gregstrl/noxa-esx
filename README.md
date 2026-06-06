@@ -98,6 +98,9 @@ Panel tablette N&B (**F6** / `/anticheat`, réservé ACE `noxa.anticheat`). Visu
 - **Actions staff** (autorité serveur, ACE re-vérifiée) : surveiller / avertir / expulser / bannir / résoudre.
   Les **bans** utilisent la table **unifiée `noxa_bans`** (partagée avec `noxa_admin`, qui applique le
   bannissement à la connexion). Détections persistées dans `noxa_ac_detections` (rechargées au démarrage).
+- **Audit durable `noxa_ac_logs`** : chaque détection (`flag`/`kick`) et chaque sanction staff
+  (`watch`/`warn`/`kick`/`ban`/`resolve`) est journalisée en base (identifier, nom, violation, score,
+  action) — survit aux redémarrages, contrairement au flux live mémoire affiché dans le panel.
 
 ## Économie & Prix (ESX natif)
 Tout passe par l'argent **ESX natif** (`cash` / `bank` / `black_money`).

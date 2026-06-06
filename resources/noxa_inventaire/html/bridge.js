@@ -175,6 +175,27 @@
     applyVisibility();
   }
 
+  // ----------------------------------------------------------------
+  // FOND — on doit voir le JEU floute derriere l'inventaire. La page
+  // NUI doit rester transparente (sinon : ecran noir) et le scrim .stage
+  // doit flouter nettement. Le bundler remplace tout le <html> a chaque
+  // chargement : on (re)injecte donc cette CSS depuis le bridge plutot
+  // que d'editer le layout fige. Re-pose par la garde si elle disparait.
+  // ----------------------------------------------------------------
+  function ensureBgStyle() {
+    if (document.getElementById('noxa-bg')) return;
+    var head = document.head || document.documentElement;
+    if (!head) return;
+    var st = document.createElement('style');
+    st.id = 'noxa-bg';
+    st.textContent =
+      'html,body{background:transparent !important;}' +
+      '.stage{background:rgba(6,8,11,.45) !important;' +
+      'backdrop-filter:blur(8px) !important;' +
+      '-webkit-backdrop-filter:blur(8px) !important;}';
+    head.appendChild(st);
+  }
+
   // --- Reception des donnees live depuis client.lua ---
   window.addEventListener('message', function (ev) {
     var d = (ev && ev.data) || {};
@@ -206,6 +227,7 @@
   applyVisibility(); // masque immediatement l'ecran de chargement
   setInterval(function () {
     install();
+    ensureBgStyle();
     if (installed && pending) { var q = pending; pending = null; applyNow(q); }
     applyVisibility();
   }, 60);

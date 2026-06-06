@@ -1064,7 +1064,7 @@ CREATE TABLE IF NOT EXISTS `noxa_ac_logs` (
 CREATE TABLE IF NOT EXISTS `noxa_phone_contacts` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `owner` VARCHAR(64) NOT NULL,
-  `name` VARCHAR(64) NOT NULL,
+  `display` VARCHAR(64) NOT NULL,
   `number` VARCHAR(20) NOT NULL,
   PRIMARY KEY (`id`), KEY `idx_owner` (`owner`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -1040,3 +1040,50 @@ CREATE TABLE IF NOT EXISTS `banking` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE `users` ADD COLUMN `pincode` INT NULL;
+
+-- =====================================================================
+--  TABLES CUSTOM NOXA (ajoutées par les ressources noxa_*)
+--  ⚠️ RÈGLE : toute nouvelle table d'une ressource Noxa DOIT être
+--  ajoutée ICI (jamais de fichier .sql séparé). install.sql = LE seul
+--  fichier à importer pour installer 100% du serveur.
+-- =====================================================================
+
+-- Anti-cheat : logs
+CREATE TABLE IF NOT EXISTS `noxa_ac_logs` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `identifier` VARCHAR(64) DEFAULT NULL,
+  `name` VARCHAR(64) DEFAULT NULL,
+  `violation` VARCHAR(64) NOT NULL,
+  `score` INT DEFAULT 0,
+  `action` VARCHAR(32) DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`), KEY `idx_ident` (`identifier`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Téléphone : contacts
+CREATE TABLE IF NOT EXISTS `noxa_phone_contacts` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `owner` VARCHAR(64) NOT NULL,
+  `name` VARCHAR(64) NOT NULL,
+  `number` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`id`), KEY `idx_owner` (`owner`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Téléphone : SMS
+CREATE TABLE IF NOT EXISTS `noxa_phone_messages` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `from_num` VARCHAR(20) NOT NULL,
+  `to_num` VARCHAR(20) NOT NULL,
+  `body` VARCHAR(512) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`), KEY `idx_from` (`from_num`), KEY `idx_to` (`to_num`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Téléphone : réseau social (tweets)
+CREATE TABLE IF NOT EXISTS `noxa_phone_tweets` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `author` VARCHAR(64) NOT NULL,
+  `body` VARCHAR(280) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

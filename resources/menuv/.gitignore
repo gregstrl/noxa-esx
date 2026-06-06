@@ -1,0 +1,12 @@
+# MenuV — dépôt de DÉPLOIEMENT FiveM.
+# Le runtime compilé (dist/, menuv.lua, menuv/components, stream, languages,
+# config.lua, fxmanifest.lua) DOIT être tracké pour qu'un déploiement frais
+# démarre sans étape de build. Seuls les artefacts de dev sont ignorés.
+
+# Dépendances & artefacts de build (régénérables via `npm i && npm run build`)
+node_modules/
+build/
+package-lock.json
+
+# Logs
+*.log

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NOXA · Store GTA RP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<template id="__bundler_thumbnail" data-bg-color="#080a0d">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#080a0d" />
+    <rect x="20" y="30" width="60" height="40" rx="5" fill="none" stroke="#f5b942" stroke-width="3" />
+    <path d="M28 58l4-5a2 2 0 0 1 3 0l4 5M40 55l5-6a2 2 0 0 1 3 0l9 9" fill="none" stroke="#f5b942" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="64" cy="42" r="4" fill="#f5b942"/>
+  </svg>
+</template>
+<style>
+:root{
+  --font:'Manrope',system-ui,sans-serif;--display:'Space Grotesk',var(--font);
+  --bg0:#080a0d;--bg1:#0e1116;--bg2:#13171e;--bg3:#1b2029;--hover:#222937;
+  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.15);
+  --txt:#f0f2f5;--mut:#8b919c;--faint:#5a606b;
+  --coin:#f5b942;--blue:#3b82f6;--purple:#a855f7;--green:#22c55e;--red:#ff5a5a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+html,body{height:100%;font-family:var(--font);color:var(--txt);}
+body{background:transparent;display:flex;align-items:center;justify-content:center;}
+.stage{position:fixed;inset:0;background:radial-gradient(120% 100% at 50% 0%,rgba(20,24,32,.5),rgba(4,6,9,.7));backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;}
+
+.shop{width:min(1260px,96vw);height:min(810px,95vh);background:var(--bg0);border:1px solid var(--bd);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 50px 110px -30px rgba(0,0,0,.85);}
+
+/* top bar */
+.top{flex:none;height:74px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--bd);background:linear-gradient(180deg,var(--bg1),var(--bg0));}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#23callto,#111);background:linear-gradient(145deg,#f5b942,#b9831f);display:grid;place-items:center;color:#1a1304;font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-1px;box-shadow:0 6px 18px -6px rgba(245,185,66,.6);}
+.brand{display:flex;flex-direction:column;line-height:1.15;}
+.brand b{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:-.3px;white-space:nowrap;}
+.brand span{font-size:10px;color:var(--mut);font-weight:700;letter-spacing:.18em;white-space:nowrap;}
+.tabs{display:flex;gap:6px;margin:0 auto;background:var(--bg2);border:1px solid var(--bd);border-radius:13px;padding:5px;}
+.tab{display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:9px;border:none;background:transparent;color:var(--mut);font-family:var(--font);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .14s;white-space:nowrap;}
+.tab:hover{color:var(--txt);}
+.tab.on{background:var(--txt);color:#10131a;}
+.tab svg{width:17px;height:17px;}
+.coin-pill{display:flex;align-items:center;gap:9px;padding:8px 15px;border-radius:13px;background:linear-gradient(180deg,rgba(245,185,66,.16),rgba(245,185,66,.06));border:1px solid rgba(245,185,66,.4);}
+.coin-pill .ci{width:22px;height:22px;color:var(--coin);filter:drop-shadow(0 0 6px rgba(245,185,66,.6));}
+.coin-pill b{font-family:var(--display);font-size:17px;font-weight:600;color:var(--coin);text-shadow:0 0 14px rgba(245,185,66,.4);}
+.coin-pill span{font-size:11px;color:var(--coin);opacity:.7;font-weight:600;}
+.iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--bd2);background:var(--bg3);color:var(--mut);cursor:pointer;display:grid;place-items:center;}
+.iconbtn:hover{color:var(--txt);background:var(--hover);}
+.iconbtn svg{width:18px;height:18px;}
+.avatar{width:42px;height:42px;border-radius:12px;background:var(--blue);display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:600;}
+
+.scroll{flex:1;overflow-y:auto;padding:22px 24px 28px;}
+.scroll::-webkit-scrollbar{width:10px;} .scroll::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:10px;border:2px solid var(--bg0);}
+
+/* hero */
+.hero{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--bd2);background:linear-gradient(110deg,#15110a 0%,#120f0a 40%,#0c0e12 100%);display:grid;grid-template-columns:1.05fr 1fr;min-height:280px;margin-bottom:26px;}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(70% 120% at 0% 50%,rgba(245,185,66,.16),transparent 60%);pointer-events:none;}
+.hero-txt{padding:34px 36px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;}
+.ribbon{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.08em;padding:6px 12px;border-radius:8px;background:linear-gradient(90deg,var(--coin),#e0962a);color:#1a1304;margin-bottom:14px;box-shadow:0 6px 18px -6px rgba(245,185,66,.7);white-space:nowrap;}
+.hero-txt h2{font-family:var(--display);font-weight:600;font-size:40px;letter-spacing:-1.2px;line-height:1;}
+.hero-txt p{color:#c9ccd2;font-size:14.5px;line-height:1.5;margin:12px 0 22px;max-width:420px;}
+.hero-foot{display:flex;align-items:center;gap:20px;}
+.cta{font-family:var(--font);font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase;padding:14px 26px;border-radius:12px;border:none;background:linear-gradient(180deg,#fbc855,#e0962a);color:#1a1304;cursor:pointer;display:inline-flex;align-items:center;gap:9px;box-shadow:0 10px 28px -8px rgba(245,185,66,.65);transition:filter .14s,transform .1s;}
+.cta:hover{filter:brightness(1.06);} .cta:active{transform:scale(.97);} .cta svg{width:17px;height:17px;}
+.hero-img{position:relative;}
+.hero-img image-slot{position:absolute;inset:0;width:100%;height:100%;}
+.hero-img::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0c0e12 0%,transparent 28%);pointer-events:none;}
+
+/* section */
+.sec-h{display:flex;align-items:center;gap:12px;margin:0 4px 14px;}
+.sec-h h3{font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:-.4px;}
+.sec-h .count{font-family:var(--display);font-size:13px;color:var(--mut);background:var(--bg2);padding:3px 10px;border-radius:8px;}
+.sec-h .sp{flex:1;}
+.search{display:flex;align-items:center;gap:9px;background:var(--bg2);border:1px solid var(--bd);border-radius:11px;padding:0 12px;height:38px;color:var(--faint);width:230px;}
+.search input{background:none;border:none;outline:none;color:var(--txt);font-family:var(--font);font-size:13px;width:100%;}
+.search svg{width:16px;height:16px;}
+
+.gridp{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:18px;}
+
+/* product card */
+.prod{background:var(--bg1);border:1px solid var(--bd);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;position:relative;transition:transform .15s,border-color .15s,box-shadow .15s;}
+.prod::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--r);z-index:3;}
+.prod:hover{transform:translateY(-4px);border-color:var(--bd2);box-shadow:0 20px 40px -18px rgba(0,0,0,.7),0 0 0 1px var(--r) inset;}
+.shot{position:relative;aspect-ratio:16/10;background:var(--bg2);}
+.shot image-slot{position:absolute;inset:0;width:100%;height:100%;}
+.rarity{position:absolute;top:10px;left:10px;z-index:4;font-size:10px;font-weight:800;letter-spacing:.06em;padding:4px 9px;border-radius:7px;background:rgba(8,10,13,.7);backdrop-filter:blur(6px);color:var(--r);border:1px solid var(--r);}
+.promo{position:absolute;top:10px;right:10px;z-index:4;font-size:10px;font-weight:800;padding:4px 8px;border-radius:7px;background:var(--coin);color:#1a1304;}
+.pb{padding:14px;display:flex;flex-direction:column;gap:5px;flex:1;}
+.pb b{font-size:15.5px;font-weight:700;}
+.pb .meta{font-size:12px;color:var(--mut);line-height:1.4;flex:1;}
+.pf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;}
+.price{display:flex;align-items:center;gap:6px;font-family:var(--display);font-weight:600;font-size:18px;color:var(--coin);}
+.price svg{width:16px;height:16px;filter:drop-shadow(0 0 5px rgba(245,185,66,.5));}
+.price s{color:var(--faint);font-size:12px;font-weight:500;margin-right:1px;}
+.buy{font-family:var(--font);font-weight:800;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;padding:9px 15px;border-radius:10px;border:none;background:linear-gradient(180deg,#fbc855,#e0962a);color:#1a1304;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:filter .14s,transform .1s;}
+.buy:hover{filter:brightness(1.06);} .buy:active{transform:scale(.95);} .buy svg{width:14px;height:14px;}
+.buy.owned{background:transparent;color:var(--green);border:1px solid rgba(34,197,94,.45);cursor:default;}
+.buy.poor{background:var(--bg3);color:var(--faint);border:1px solid var(--bd);cursor:not-allowed;}
+
+/* toast */
+.toast{position:fixed;bottom:34px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--bg3);border:1px solid var(--bd2);color:var(--txt);font-size:13.5px;font-weight:700;padding:12px 18px;border-radius:12px;display:flex;align-items:center;gap:9px;z-index:90;transition:all .2s;box-shadow:0 16px 40px rgba(0,0,0,.6);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast svg{width:18px;height:18px;} .toast.ok svg{color:var(--green);} .toast.err svg{color:var(--red);}
+@keyframes cp{0%,100%{transform:scale(1);}40%{transform:scale(1.16);}}
+.coin-pill.bump{animation:cp .4s ease;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="shop">
+    <div class="top">
+      <div class="logo">N</div>
+      <div class="brand"><b>NOXA FA</b><span>STORE</span></div>
+      <div class="tabs" id="tabs"></div>
+      <div class="coin-pill" id="coinPill"><span class="ci" id="coinIc"></span><div><b id="coinBal">1 250</b> <span>coins</span></div></div>
+      <button class="iconbtn" id="recharge" title="Recharger"><span id="plusIc"></span></button>
+      <div class="avatar">MW</div>
+      <button class="iconbtn" id="close" title="Fermer"><span id="xIc"></span></button>
+    </div>
+
+    <div class="scroll">
+      <div class="hero" id="hero"></div>
+      <div class="sec-h"><h3 id="catTitle">Tout le catalogue</h3><span class="count" id="catCount"></span><span class="sp"></span>
+        <div class="search"><span id="srchIc"></span><input id="search" placeholder="Rechercher…" /></div>
+      </div>
+      <div class="gridp" id="grid"></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="image-slot.js"></script>
+<script>
+const G={
+  coin:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7l1.3 2.8 3 .3-2.3 2 .7 3-2.7-1.6-2.7 1.6.7-3-2.3-2 3-.3z',
+  gift:'M3 11h18v9H3zM3 11V8h18v3M12 8v12M8.5 8a2 2 0 1 1 0-4c2.2 0 3.5 4 3.5 4M15.5 8a2 2 0 1 0 0-4c-2.2 0-3.5 4-3.5 4',
+  crown:'M3 8l4 4 5-7 5 7 4-4-1.6 11H4.6zM4 21h16',
+  car:'M3 13l2-5a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 5v5H3zM7 18v2M17 18v2M6 13h12',
+  box:'M12 3l8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5M12 12v9',
+  grid:'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  search:'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14M21 21l-4.3-4.3',
+  cart:'M3 4h2l2.5 12h11l2-8H6M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2M18 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2',
+  check:'M20 6 9 17l-5-5',plus:'M12 5v14M5 12h14',x:'M18 6 6 18M6 6l12 12',bolt:'M13 2 4 14h7l-1 8 9-12h-7z',
+};
+const svg=(d,w)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||1.8)+'" stroke-linecap="round" stroke-linejoin="round">'+d.split('M').filter(Boolean).map(s=>'<path d="M'+s+'"/>').join('')+'</svg>';
+const RAR={commun:['COMMUN','#8b919c'],rare:['RARE','#3b82f6'],epique:['ÉPIQUE','#a855f7'],legend:['LÉGENDAIRE','#f5b942']};
+
+const CATS=[['all','Tout','grid'],['packs','Packs','gift'],['vehicles','Véhicules','car'],['items','Items','box'],['grades','Grades','crown']];
+const P=[
+  {cat:'packs',nm:'Pack Starter',meta:'Argent de départ, téléphone et tenue offerte.',price:250,r:'commun'},
+  {cat:'packs',nm:'Pack Braqueur',meta:'Crochets, masque, sac et munitions inclus.',price:900,r:'rare'},
+  {cat:'grades',nm:'VIP Bronze',meta:'File prioritaire + 5% de salaire bonus.',price:600,r:'rare',own:true},
+  {cat:'grades',nm:'VIP Argent',meta:'Garage +5 slots, 10% bonus, blip discret.',price:1200,r:'epique',promo:''},
+  {cat:'grades',nm:'VIP Or',meta:'Tous les avantages + véhicule VIP exclusif.',price:2500,r:'legend'},
+  {cat:'vehicles',nm:'Sultan RS',meta:'Compacte sportive nerveuse, parfaite en ville.',price:800,r:'rare'},
+  {cat:'vehicles',nm:'Adder',meta:'Supercar emblématique, vitesse de pointe énorme.',price:2600,r:'legend',promo:'NEW'},
+  {cat:'vehicles',nm:'Kuruma Blindé',meta:'Berline blindée, idéale pour les braquages.',price:1500,r:'epique'},
+  {cat:'items',nm:'Munitions x500',meta:'Recharge complète armes de poing.',price:120,r:'commun'},
+  {cat:'items',nm:'Kit réparation x5',meta:'Répare ton véhicule instantanément.',price:200,r:'commun'},
+  {cat:'items',nm:'Sac à dos +20kg',meta:'Augmente ta capacité de portage à vie.',price:450,r:'rare'},
+  {cat:'items',nm:'Téléphone Pro',meta:'Skin exclusif + thèmes premium.',price:150,r:'rare'},
+];
+const HERO={nm:'Pack Légende',meta:'Le pack ultime : véhicule sport légendaire, 50 000$ cash, grade VIP Or et accès prioritaire permanent au serveur.',price:2400,old:3000,r:'legend'};
+
+let coins=1250, cat='all', q='';
+const owned=new Set(P.filter(p=>p.own).map(p=>p.nm));
+const fmt=n=>n.toLocaleString('fr-FR');
+const slug=s=>'sl-'+s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'-');
+
+document.getElementById('coinIc').innerHTML=svg(G.coin);
+document.getElementById('plusIc').innerHTML=svg(G.plus,2.2);
+document.getElementById('xIc').innerHTML=svg(G.x,2.1);
+document.getElementById('srchIc').innerHTML=svg(G.search);
+
+// tabs
+document.getElementById('tabs').innerHTML=CATS.map(c=>`<button class="tab ${c[0]==='all'?'on':''}" data-cat="${c[0]}">${svg(G[c[2]])}<span>${c[1]}</span></button>`).join('');
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cat=b.dataset.cat;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));document.getElementById('catTitle').textContent=cat==='all'?'Tout le catalogue':CATS.find(c=>c[0]===cat)[1];render();});
+document.getElementById('search').addEventListener('input',e=>{q=e.target.value.toLowerCase();render();});
+
+// hero
+document.getElementById('hero').innerHTML=`
+  <div class="hero-txt">
+    <span class="ribbon">${RAR[HERO.r][0]} · -20%</span>
+    <h2>${HERO.nm}</h2>
+    <p>${HERO.meta}</p>
+    <div class="hero-foot">
+      <div class="price" style="font-size:30px">${svg(G.coin)}<s style="font-size:16px">${fmt(HERO.old)}</s>${fmt(HERO.price)}</div>
+      <button class="cta" id="heroBuy">${svg(G.cart)}Acheter</button>
+    </div>
+  </div>
+  <div class="hero-img"><image-slot id="sl-hero" shape="rect" fit="cover" placeholder="Glisse le render du pack (PNG/JPG)"></image-slot></div>`;
+document.getElementById('heroBuy').onclick=()=>doBuy(HERO,true);
+
+function cardHTML(p){
+  const [rl,rc]=RAR[p.r];
+  let btn;
+  if(owned.has(p.nm)) btn=`<button class="buy owned" disabled>${svg(G.check,2.2)}Possédé</button>`;
+  else if(coins<p.price) btn=`<button class="buy poor" data-nm="${p.nm}">Coins insuffisants</button>`;
+  else btn=`<button class="buy" data-nm="${p.nm}">${svg(G.cart)}Acheter</button>`;
+  return `<div class="prod" style="--r:${rc}">
+    <div class="shot">
+      <span class="rarity" style="--r:${rc}">${rl}</span>
+      ${p.promo?`<span class="promo">${p.promo}</span>`:''}
+      <image-slot id="${slug(p.nm)}" shape="rect" fit="cover" placeholder="Glisse une image"></image-slot>
+    </div>
+    <div class="pb"><b>${p.nm}</b><div class="meta">${p.meta}</div>
+      <div class="pf"><div class="price">${svg(G.coin)}${fmt(p.price)}</div>${btn}</div>
+    </div></div>`;
+}
+function render(){
+  let list=P.filter(p=>cat==='all'||p.cat===cat);
+  if(q) list=list.filter(p=>(p.nm+p.meta).toLowerCase().includes(q));
+  document.getElementById('catCount').textContent=list.length+' articles';
+  const el=document.getElementById('grid');
+  el.innerHTML=list.length?list.map(cardHTML).join(''):'<div style="color:var(--mut);padding:50px;grid-column:1/-1;text-align:center">Aucun produit.</div>';
+}
+document.getElementById('grid').addEventListener('click',e=>{const b=e.target.closest('.buy');if(!b||!b.dataset.nm)return;doBuy(P.find(p=>p.nm===b.dataset.nm));});
+
+function doBuy(p,hero){
+  if(owned.has(p.nm)) return;
+  if(coins<p.price){ toast('Coins insuffisants — recharge ton solde.','err'); return; }
+  coins-=p.price;
+  if(p.cat==='packs'||p.cat==='grades'||hero) owned.add(p.nm);
+  updateCoins(); render();
+  toast(p.nm+' acheté avec succès !','ok');
+}
+function updateCoins(){ document.getElementById('coinBal').textContent=fmt(coins); const pill=document.getElementById('coinPill'); pill.classList.remove('bump'); void pill.offsetWidth; pill.classList.add('bump'); }
+document.getElementById('recharge').onclick=()=>{ coins+=1000; updateCoins(); render(); toast('+1 000 coins ajoutés !','ok'); };
+
+let tt;
+function toast(msg,type){const el=document.getElementById('toast');el.className='toast show '+(type||'');el.innerHTML=svg(type==='err'?G.bolt:G.check,2.1)+'<span>'+msg+'</span>';clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2200);}
+render();
+</script>
+</body>
+</html>

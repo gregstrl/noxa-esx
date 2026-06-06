@@ -15,7 +15,7 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
   - `noxa_boutique` — boutique (F7)
 
 ## Installation
-1. Importer `[SQL]/legacy.sql` dans ta base MySQL `noxa` (phpMyAdmin)
+1. Importer `[SQL]/legacy.sql` puis `[SQL]/noxa_phone.sql` dans ta base MySQL `noxa` (phpMyAdmin)
 2. Ouvrir `server.cfg` — remplir `sv_licenseKey` + `mysql_connection_string`
 3. Placer le dossier `resources/` dans ton serveur FiveM
 4. Ajouter `exec server.cfg` dans ton serveur, ou utiliser ce server.cfg
@@ -32,5 +32,6 @@ panels NUI premium (designs Claude Design) et développée quotidiennement par d
 |---|---|---|
 | ESX Legacy core | ✅ | Framework officiel |
 | Panels NUI (visuels) | ✅ | anti-cheat, phone, gestion, inventaire, boutique |
-| Liaison données panels | 🟡 | en cours (agents) |
+| Liaison données panels | 🟡 | phone lié au serveur ESX (contacts, SMS, banque, Canari, garage) · autres en cours |
+| Téléphone (F1) | ✅ | données live ESX/SQL, envoi SMS + tweets, ouverture/fermeture |
 > ✅ Fonctionnel · 🟡 En cours · ❌ Non démarré
